@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaksi Pembayaran</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Transaksi Pembayaran</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Produk</a></li>
+                <li><a href="kategori.html">Kategori</a></li>
+                <li><a href="supplier.html">Supplier</a></li>
+                <li><a href="transaksi.html">Transaksi</a></li>
+                <li><a href="laporan.html">Laporan</a></li>
+                <li><a href="pengguna.html">Pengguna</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="transaksi-section">
+            <h2>Form Transaksi Pembayaran</h2>
+            <form id="form-transaksi">
+                <input type="number" id="produk-id" placeholder="ID Produk" required>
+                <input type="number" id="jumlah-produk" placeholder="Jumlah Produk" required>
+                <input type="text" id="alamat" placeholder="Alamat Pengiriman" required>
+                <input type="number" id="ongkir" placeholder="Ongkir (Rp)" required>
+                <button type="submit">Proses Pembayaran</button>
+            </form>
+            <h3>Total Pembayaran: Rp <span id="total-pembayaran">0</span></h3>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Sistem Informasi Produk. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
