@@ -25,6 +25,23 @@
         </form>
     </section>
 
+    <section id="transaksi">
+        <h2>Transaksi Pembayaran</h2>
+        <form id="form-transaksi">
+            <input type="number" id="produk-id" placeholder="ID Produk" required>
+            <input type="number" id="jumlah-produk" placeholder="Jumlah Produk" required>
+            <input type="text" id="alamat" placeholder="Alamat Pengiriman" required>
+            <input type="number" id="ongkir" placeholder="Ongkir (Rp)" required>
+            <button type="submit">Proses Pembayaran</button>
+        </form>
+        <h3>Total Pembayaran: Rp <span id="total-pembayaran">0</span></h3>
+    </section>
+
+    <section id="laporan-supplier">
+        <h2>Laporan Supplier</h2>
+        <button onclick="lihatLaporanSupplier()">Lihat Laporan Supplier</button>
+    </section>
+
     <script src="script.js"></script>
 </body>
 </html>
