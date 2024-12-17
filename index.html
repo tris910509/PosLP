@@ -1,1 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplikasi Kasir</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid black;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>Aplikasi Kasir Sederhana</h1>
+  
+  <label for="product">Nama Barang:</label>
+  <input type="text" id="product" placeholder="Nama Barang" required><br><br>
+
+  <label for="price">Harga:</label>
+  <input type="number" id="price" placeholder="Harga" required><br><br>
+
+  <label for="quantity">Jumlah:</label>
+  <input type="number" id="quantity" placeholder="Jumlah" required><br><br>
+
+  <button onclick="addTransaction()">Tambah Transaksi</button>
+  <button onclick="submitTransactions()">Simpan Transaksi ke Google Sheets</button>
+
+  <h3>Daftar Transaksi:</h3>
+  <table id="transactionTable">
+    <thead>
+      <tr>
+        <th>Nama Barang</th>
+        <th>Harga</th>
+        <th>Jumlah</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Data transaksi akan ditambahkan di sini -->
+    </tbody>
+  </table>
+
+  <script>
+    // Array untuk menyimpan data transaksi sementara
+    let transactions = [];
+
+    function addTransaction() {
+      const product = document.getElementById('product').value;
+      const price = parseFloat(document.getElementById('price').value);
+      const quantity = parseInt(document.getElementById('quantity').value);
+
+      if (product && price && quantity) {
+        const total = price * quantity;
+        transactions.push({ product, price, quantity, total });
+
+        // Menambahkan transaksi ke tabel
+        const table = document.getElementById('transactionTable').getElementsByTagName('tbody')[0];
+        const row = table.insertRow();
+        row.insertCell(0).innerText = product;
+        row.insertCell(1).innerText = price;
+        row.insertCell(2).innerText = quantity;
+        row.insertCell(3).innerText = total;
+
+        // Reset form input
+        document.getElementById('product').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('quantity').value = '';
+      } else {
+        alert('Harap lengkapi semua data!');
+      }
+    }
+
+    function submitTransactions() {
+      // Pastikan ada transaksi yang ditambahkan
+      if (transactions.length === 0) {
+        alert('Tidak ada transaksi untuk disimpan!');
+        return;
+      }
+
+      const sheetId = 'YOUR_SHEET_ID';  // Ganti dengan ID spreadsheet Google Sheets Anda
+      const apiKey = 'YOUR_API_KEY';    // Ganti dengan API Key Anda
+      const range = 'Transaksi!A1:D1';  // Nama sheet dan range data
+
+      // URL API Google Sheets
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}:append?valueInputOption=RAW&key=${apiKey}`;
+
+      // Mengirim transaksi ke Google Sheets
+      const body = {
+        values: transactions.map(t => [new Date().toLocaleString(), t.product, t.price, t.quantity, t.total])
+      };
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert('Transaksi berhasil disimpan ke Google Sheets!');
+        // Reset transaksi setelah disimpan
+        transactions = [];
+        document.getElementById('transactionTable').getElementsByTagName('tbody')[0].innerHTML = '';
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat menyimpan data!');
+      });
+    }
+  </script>
 
