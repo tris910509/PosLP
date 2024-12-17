@@ -1,220 +1,30 @@
-<!-- Form untuk menambah transaksi ChatGPT 4o mini
-
-Masuk
-Anda bilang:
-buatkan aplikasi kasir javascrip html googlesheet
-ChatGPT bilang:
-ChatGPT
-Untuk membuat aplikasi kasir sederhana menggunakan HTML, JavaScript, dan Google Sheets sebagai database, kamu bisa mengikuti langkah-langkah di bawah ini. Kita akan menggunakan Google Sheets sebagai backend untuk menyimpan data transaksi dan produk, serta menggunakan JavaScript untuk interaksi di frontend.
-
-Langkah-langkah:
-Siapkan Google Sheets untuk menyimpan data produk dan transaksi.
-Buat HTML untuk antarmuka aplikasi kasir.
-Gunakan Google Sheets API untuk menghubungkan aplikasi dengan Google Sheets.
-Langkah 1: Siapkan Google Sheets
-Buat Spreadsheet di Google Sheets untuk menyimpan data produk.
-
-Misalnya, sheet pertama dengan nama "Produk" dan kolom: ID, Nama Produk, Harga, Stok.
-Sheet kedua dengan nama "Transaksi" dan kolom: ID Transaksi, Tanggal, Total Harga.
-Buka Google Sheets API:
-
-Kunjungi Google Cloud Console.
-Buat project baru dan aktifkan Google Sheets API dan Google Drive API.
-Buat kredensial API key untuk mengakses Google Sheets.
-Bagikan Spreadsheet ke email service account yang kamu buat di Google Cloud Console, agar bisa diakses melalui API.
-
-Langkah 2: HTML dan JavaScript untuk Aplikasi Kasir
-Berikut adalah contoh kode untuk antarmuka dan logika aplikasi kasir yang terhubung ke Google Sheets:-->
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Kasir</title>
-    <script src="https://apis.google.com/js/api.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 8px;
-            text-align: center;
-        }
-    </style>
+    <title>Sistem Informasi Produk</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Aplikasi Kasir</h1>
+    <header>
+        <h1>Sistem Informasi Produk</h1>
+    </header>
 
-    <!-- Form untuk menambah transaksi -->
-    <h3>Tambah Transaksi</h3>
-    <input type="number" id="produkID" placeholder="ID Produk" />
-    <input type="number" id="jumlah" placeholder="Jumlah" />
-    <button onclick="addTransaction()">Tambah Transaksi</button>
+    <section id="produk-section">
+        <h2>Daftar Produk</h2>
+        <ul id="produk-list"></ul>
+    </section>
 
-    <h3>Produk</h3>
-    <table id="productTable">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nama Produk</th>
-                <th>Harga</th>
-                <th>Stok</th>
-            </tr>
-        </thead>
-        <tbody id="productList"></tbody>
-    </table>
+    <section id="tambah-produk">
+        <h2>Tambah Produk</h2>
+        <form id="form-tambah-produk">
+            <input type="text" id="nama-produk" placeholder="Nama Produk" required>
+            <input type="number" id="harga-produk" placeholder="Harga Produk" required>
+            <button type="submit">Tambah Produk</button>
+        </form>
+    </section>
 
-    <h3>Transaksi</h3>
-    <table id="transactionTable">
-        <thead>
-            <tr>
-                <th>ID Transaksi</th>
-                <th>Tanggal</th>
-                <th>Total Harga</th>
-            </tr>
-        </thead>
-        <tbody id="transactionList"></tbody>
-    </table>
-
-    <script>
-        const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID';
-        const API_KEY = 'YOUR_GOOGLE_API_KEY';
-        const CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID';
-        const SHEET_NAME_PRODUCTS = 'Produk';
-        const SHEET_NAME_TRANSACTIONS = 'Transaksi';
-
-        // Inisialisasi client Google API
-        function initGoogleAPI() {
-            gapi.load('client', init);
-        }
-
-        function init() {
-            gapi.client.init({
-                apiKey: API_KEY,
-                clientId: CLIENT_ID,
-                discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
-                scope: "https://www.googleapis.com/auth/spreadsheets"
-            }).then(() => {
-                console.log('Google API siap digunakan');
-                loadProducts();
-                loadTransactions();
-            });
-        }
-
-        // Fungsi untuk mengambil data produk
-        function loadProducts() {
-            const range = `${SHEET_NAME_PRODUCTS}!A2:D`;  // Ambil data produk
-            gapi.client.sheets.spreadsheets.values.get({
-                spreadsheetId: SPREADSHEET_ID,
-                range: range
-            }).then(response => {
-                const products = response.result.values;
-                const productTable = document.getElementById('productList');
-                productTable.innerHTML = ''; // Kosongkan tabel sebelumnya
-                products.forEach(product => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td>${product[0]}</td><td>${product[1]}</td><td>${product[2]}</td><td>${product[3]}</td>`;
-                    productTable.appendChild(row);
-                });
-            });
-        }
-
-        // Fungsi untuk menambah transaksi
-        function addTransaction() {
-            const productID = document.getElementById('produkID').value;
-            const quantity = document.getElementById('jumlah').value;
-
-            if (!productID || !quantity) {
-                alert('Harap masukkan ID Produk dan Jumlah');
-                return;
-            }
-
-            // Ambil data produk berdasarkan ID
-            const range = `${SHEET_NAME_PRODUCTS}!A2:D`;
-            gapi.client.sheets.spreadsheets.values.get({
-                spreadsheetId: SPREADSHEET_ID,
-                range: range
-            }).then(response => {
-                const products = response.result.values;
-                const product = products.find(p => p[0] === productID);
-                if (product) {
-                    const productName = product[1];
-                    const price = parseFloat(product[2]);
-                    const stock = parseInt(product[3]);
-                    if (stock >= quantity) {
-                        const totalPrice = price * quantity;
-                        // Simpan transaksi ke sheet Transaksi
-                        const transactionData = [
-                            [new Date().toLocaleString(), totalPrice]
-                        ];
-                        gapi.client.sheets.spreadsheets.values.append({
-                            spreadsheetId: SPREADSHEET_ID,
-                            range: `${SHEET_NAME_TRANSACTIONS}!A2:B`,
-                            valueInputOption: 'RAW',
-                            resource: {
-                                values: transactionData
-                            }
-                        }).then(() => {
-                            alert('Transaksi berhasil');
-                            loadTransactions();
-                        });
-                    } else {
-                        alert('Stok tidak cukup');
-                    }
-                } else {
-                    alert('Produk tidak ditemukan');
-                }
-            });
-        }
-
-        // Fungsi untuk mengambil data transaksi
-        function loadTransactions() {
-            const range = `${SHEET_NAME_TRANSACTIONS}!A2:B`;  // Ambil data transaksi
-            gapi.client.sheets.spreadsheets.values.get({
-                spreadsheetId: SPREADSHEET_ID,
-                range: range
-            }).then(response => {
-                const transactions = response.result.values;
-                const transactionTable = document.getElementById('transactionList');
-                transactionTable.innerHTML = ''; // Kosongkan tabel transaksi sebelumnya
-                transactions.forEach(transaction => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td>${transaction[0]}</td><td>${transaction[1]}</td>`;
-                    transactionTable.appendChild(row);
-                });
-            });
-        }
-
-        // Inisialisasi Google API setelah halaman dimuat
-        window.onload = initGoogleAPI;
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
-<!-- Penjelasan:
-HTML Form: Ada form untuk memasukkan ID Produk dan Jumlah yang ingin dibeli.
-Google Sheets API: Aplikasi akan mengakses Google Sheets untuk mengambil data produk dan transaksi, serta menambah transaksi baru.
-Tabel Produk dan Transaksi: Menampilkan data produk dan transaksi dari Google Sheets.
-Fungsi addTransaction: Fungsi ini memeriksa apakah produk ada dan stok cukup sebelum menambah transaksi ke Google Sheets.
-Langkah 3: Pengaturan API Key dan Client ID
-Gantilah YOUR_SPREADSHEET_ID dengan ID Spreadsheet kamu.
-Gantilah YOUR_GOOGLE_API_KEY dan YOUR_GOOGLE_CLIENT_ID dengan kredensial yang telah kamu buat di Google Cloud Console.
-Kesimpulan:
-Dengan mengikuti langkah-langkah di atas, kamu bisa membuat aplikasi kasir yang sederhana dengan Google Sheets sebagai database untuk menyimpan produk dan transaksi. Kamu bisa mengembangkan aplikasi ini lebih lanjut, seperti menambahkan fitur login atau autentikasi, laporan penjualan, dan lain-lain.
-
-
-
-
-
-
-
-ChatGPT dapat membuat kesalahan. Periksa info penting.
-? -->
