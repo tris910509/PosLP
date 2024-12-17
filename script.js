@@ -1,21 +1,18 @@
 // Mendapatkan elemen dari DOM
 const formProduk = document.getElementById("form-tambah-produk");
 const produkList = document.getElementById("produk-list");
-const namaProdukInput = document.getElementById("nama-produk");
-const hargaProdukInput = document.getElementById("harga-produk");
+const kategoriList = document.getElementById("kategori-list");
+const supplierList = document.getElementById("supplier-list");
+const transaksiList = document.getElementById("laporan-list");
+const penggunaList = document.getElementById("pengguna-list");
 
-const formTransaksi = document.getElementById("form-transaksi");
-const produkIdInput = document.getElementById("produk-id");
-const jumlahProdukInput = document.getElementById("jumlah-produk");
-const alamatInput = document.getElementById("alamat");
-const ongkirInput = document.getElementById("ongkir");
-const totalPembayaran = document.getElementById("total-pembayaran");
-
-// Menyimpan data produk dalam localStorage (jika ada)
 let produkArray = JSON.parse(localStorage.getItem("produk")) || [];
+let kategoriArray = JSON.parse(localStorage.getItem("kategori")) || [];
+let supplierArray = JSON.parse(localStorage.getItem("supplier")) || [];
 let transaksiArray = JSON.parse(localStorage.getItem("transaksi")) || [];
+let penggunaArray = JSON.parse(localStorage.getItem("pengguna")) || [];
 
-// Fungsi untuk menampilkan daftar produk
+// Fungsi untuk menampilkan produk
 function tampilkanProduk() {
     produkList.innerHTML = "";
     produkArray.forEach((produk, index) => {
@@ -28,28 +25,26 @@ function tampilkanProduk() {
     });
 }
 
-// Fungsi untuk menambah produk
+// Fungsi untuk menambahkan produk
 formProduk.addEventListener("submit", function (e) {
     e.preventDefault();
 
-    const namaProduk = namaProdukInput.value.trim();
-    const hargaProduk = hargaProdukInput.value.trim();
+    const namaProduk = document.getElementById("nama-produk").value;
+    const hargaProduk = document.getElementById("harga-produk").value;
 
     if (namaProduk && hargaProduk) {
         const produkBaru = {
             nama: namaProduk,
-            harga: hargaProduk,
+            harga: parseInt(hargaProduk),
         };
 
-        // Menambahkan produk ke array
         produkArray.push(produkBaru);
         localStorage.setItem("produk", JSON.stringify(produkArray));
 
         // Reset form input
-        namaProdukInput.value = "";
-        hargaProdukInput.value = "";
+        document.getElementById("nama-produk").value = "";
+        document.getElementById("harga-produk").value = "";
 
-        // Menampilkan produk yang terbaru
         tampilkanProduk();
     }
 });
@@ -61,63 +56,48 @@ function hapusProduk(index) {
     tampilkanProduk();
 }
 
-// Fungsi untuk mengelola transaksi pembayaran
-formTransaksi.addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    const produkId = parseInt(produkIdInput.value);
-    const jumlahProduk = parseInt(jumlahProdukInput.value);
-    const alamat = alamatInput.value.trim();
-    const ongkir = parseInt(ongkirInput.value);
-
-    if (!produkId || !jumlahProduk || !alamat || !ongkir) {
-        alert("Semua field harus diisi.");
-        return;
-    }
-
-    const produk = produkArray[produkId - 1];
-    if (!produk) {
-        alert("Produk tidak ditemukan.");
-        return;
-    }
-
-    const totalHarga = produk.harga * jumlahProduk;
-    const totalBayar = totalHarga + ongkir;
-
-    // Menyimpan transaksi dalam array
-    const transaksi = {
-        produk: produk.nama,
-        jumlah: jumlahProduk,
-        totalHarga: totalHarga,
-        ongkir: ongkir,
-        alamat: alamat,
-        totalBayar: totalBayar,
-        tanggal: new Date().toLocaleString(),
-    };
-
-    transaksiArray.push(transaksi);
-    localStorage.setItem("transaksi", JSON.stringify(transaksiArray));
-
-    // Menampilkan total pembayaran
-    totalPembayaran.textContent = totalBayar.toLocaleString();
-
-    // Reset form transaksi
-    produkIdInput.value = "";
-    jumlahProdukInput.value = "";
-    alamatInput.value = "";
-    ongkirInput.value = "";
-});
-
-// Fungsi untuk menampilkan laporan supplier
-function lihatLaporanSupplier() {
-    const laporanWindow = window.open("", "_blank", "width=800,height=600");
-    laporanWindow.document.write("<h1>Laporan Supplier</h1>");
-    transaksiArray.forEach((transaksi, index) => {
-        laporanWindow.document.write(`
-            <p>Transaksi ${index + 1}: ${transaksi.produk} (Jumlah: ${transaksi.jumlah}) - Rp. ${transaksi.totalBayar}</p>
-        `);
+// Menampilkan data pada halaman kategori, supplier, dan laporan
+function tampilkanKategori() {
+    kategoriList.innerHTML = "";
+    kategoriArray.forEach((kategori, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${kategori.nama}</strong>`;
+        kategoriList.appendChild(li);
     });
 }
 
-// Menampilkan produk pada saat pertama kali halaman dimuat
-tampilkanProduk();
+function tampilkanSupplier() {
+    supplierList.innerHTML = "";
+    supplierArray.forEach((supplier, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${supplier.nama}</strong>`;
+        supplierList.appendChild(li);
+    });
+}
+
+function tampilkanLaporan() {
+    transaksiList.innerHTML = "";
+    transaksiArray.forEach((transaksi, index) => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+            <p>Transaksi ${index + 1} | Produk: ${transaksi.produk} | Jumlah: ${transaksi.jumlah} | Total Bayar: Rp. ${transaksi.totalBayar} | Tanggal: ${transaksi.tanggal}</p>
+        `;
+        transaksiList.appendChild(div);
+    });
+}
+
+function tampilkanPengguna() {
+    penggunaList.innerHTML = "";
+    penggunaArray.forEach((pengguna, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${pengguna.nama}</strong>`;
+        penggunaList.appendChild(li);
+    });
+}
+
+// Memanggil fungsi untuk menampilkan data saat halaman dimuat
+if (produkList) tampilkanProduk();
+if (kategoriList) tampilkanKategori();
+if (supplierList) tampilkanSupplier();
+if (transaksiList) tampilkanLaporan();
+if (penggunaList) tampilkanPengguna();
