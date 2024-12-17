@@ -9,38 +9,28 @@
 <body>
     <header>
         <h1>Sistem Informasi Produk</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Produk</a></li>
+                <li><a href="kategori.html">Kategori</a></li>
+                <li><a href="supplier.html">Supplier</a></li>
+                <li><a href="transaksi.html">Transaksi</a></li>
+                <li><a href="laporan.html">Laporan</a></li>
+                <li><a href="pengguna.html">Pengguna</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <section id="produk-section">
-        <h2>Daftar Produk</h2>
-        <ul id="produk-list"></ul>
-    </section>
+    <main>
+        <section id="produk-section">
+            <h2>Daftar Produk</h2>
+            <ul id="produk-list"></ul>
+        </section>
+    </main>
 
-    <section id="tambah-produk">
-        <h2>Tambah Produk</h2>
-        <form id="form-tambah-produk">
-            <input type="text" id="nama-produk" placeholder="Nama Produk" required>
-            <input type="number" id="harga-produk" placeholder="Harga Produk" required>
-            <button type="submit">Tambah Produk</button>
-        </form>
-    </section>
-
-    <section id="transaksi">
-        <h2>Transaksi Pembayaran</h2>
-        <form id="form-transaksi">
-            <input type="number" id="produk-id" placeholder="ID Produk" required>
-            <input type="number" id="jumlah-produk" placeholder="Jumlah Produk" required>
-            <input type="text" id="alamat" placeholder="Alamat Pengiriman" required>
-            <input type="number" id="ongkir" placeholder="Ongkir (Rp)" required>
-            <button type="submit">Proses Pembayaran</button>
-        </form>
-        <h3>Total Pembayaran: Rp <span id="total-pembayaran">0</span></h3>
-    </section>
-
-    <section id="laporan-supplier">
-        <h2>Laporan Supplier</h2>
-        <button onclick="lihatLaporanSupplier()">Lihat Laporan Supplier</button>
-    </section>
+    <footer>
+        <p>&copy; 2024 Sistem Informasi Produk. All rights reserved.</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
