@@ -1,7 +1,13 @@
-body {
-    font-family: Arial, sans-serif;
+/* Reset CSS */
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body */
+body {
+    font-family: Arial, sans-serif;
     background-color: #f4f4f9;
     color: #333;
 }
@@ -13,30 +19,52 @@ header {
     text-align: center;
 }
 
-h1 {
-    margin: 0;
+nav ul {
+    list-style: none;
+    padding: 0;
 }
 
-section {
+nav ul li {
+    display: inline;
+    margin: 0 10px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+main {
     margin: 20px;
 }
 
-input {
-    padding: 10px;
-    margin: 5px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+section {
+    margin-bottom: 20px;
 }
 
-button {
+h1, h2 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+form input {
+    width: 300px;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+form button {
     padding: 10px 15px;
     background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 5px;
+    cursor: pointer;
 }
 
-button:hover {
+form button:hover {
     background-color: #45a049;
 }
 
@@ -51,4 +79,12 @@ li {
     padding: 10px;
     border-radius: 5px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px 0;
+    background-color: #4CAF50;
+    color: white;
 }
