@@ -1,67 +1,297 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POS Toko</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Aplikasi Kasir - Komplek</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h2, h3 {
+            color: #2C3E50;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, select {
+            margin: 5px;
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #2980B9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3498DB;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        li {
+            background-color: #f1f1f1;
+            margin: 5px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        #adminControls {
+            display: none;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Point of Sale (POS) Toko</h1>
 
-        <!-- Form login -->
-        <div id="login-section">
-            <h2>Login</h2>
-            <label for="username">Username:</label>
-            <input type="text" id="username">
-            <label for="password">Password:</label>
-            <input type="password" id="password">
-            <button id="login-btn">Login</button>
-        </div>
+<!-- Halaman Login -->
+<div id="loginPage">
+    <h2>Login Aplikasi Kasir</h2>
+    <label for="username">Username:</label>
+    <input type="text" id="username" placeholder="Masukkan Username"><br><br>
 
-        <!-- Display setelah login -->
-        <div id="pos-section" style="display:none;">
-            <h2>Selamat datang, <span id="user-role"></span></h2>
-            
-            <!-- Filter Kategori Produk -->
-            <div>
-                <h3>Filter Produk</h3>
-                <select id="category-filter">
-                    <option value="">Pilih Kategori</option>
-                    <!-- Kategori akan dimuat disini -->
-                </select>
-            </div>
+    <label for="password">Password:</label>
+    <input type="password" id="password" placeholder="Masukkan Password"><br><br>
 
-            <!-- Daftar Produk -->
-            <div class="product-list">
-                <h3>Produk</h3>
-                <div id="product-container"></div>
-            </div>
+    <button onclick="login()">Login</button>
+</div>
 
-            <!-- Keranjang -->
-            <div class="cart">
-                <h3>Keranjang</h3>
-                <ul id="cart-items"></ul>
-                <p><strong>Total: </strong><span id="total-price">Rp 0</span></p>
-                <label for="payment-method">Metode Pembayaran:</label>
-                <select id="payment-method">
-                    <option value="cash">Tunai</option>
-                    <option value="card">Kartu Kredit</option>
-                    <option value="transfer">Transfer Bank</option>
-                </select>
-                <button id="checkout-btn">Checkout</button>
-            </div>
+<!-- Halaman Aplikasi Kasir -->
+<div id="appPage" class="hidden">
+    <h2>Aplikasi Kasir</h2>
 
-            <!-- Laporan Transaksi -->
-            <div class="report">
-                <h3>Laporan Transaksi</h3>
-                <canvas id="salesChart"></canvas>
-            </div>
-        </div>
+    <!-- Kontrol Admin -->
+    <div id="adminControls">
+        <h3>Tambah Produk</h3>
+        <label for="nama_produk">Nama Produk:</label>
+        <input type="text" id="nama_produk" placeholder="Nama produk"><br><br>
+
+        <label for="harga">Harga:</label>
+        <input type="number" id="harga" placeholder="Harga produk"><br><br>
+
+        <label for="stok">Stok:</label>
+        <input type="number" id="stok" placeholder="Stok produk"><br><br>
+
+        <button onclick="tambahProduk()">Tambah Produk</button><br><br>
+
+        <h3>Produk yang Tersedia</h3>
+        <ul id="produk-list"></ul>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Transaksi dan Pembayaran Kasir -->
+    <h3>Transaksi</h3>
+    <label for="produk_id">ID Produk:</label>
+    <input type="number" id="produk_id" placeholder="ID Produk"><br><br>
+
+    <label for="jumlah">Jumlah:</label>
+    <input type="number" id="jumlah" placeholder="Jumlah beli"><br><br>
+
+    <label for="diskon">Diskon (%):</label>
+    <input type="range" id="diskon" min="0" max="100" value="0">
+    <p id="diskon-text">Diskon: 0%</p><br><br>
+
+    <button onclick="prosesTransaksi()">Proses Transaksi</button><br><br>
+
+    <h3>Riwayat Transaksi</h3>
+    <ul id="transaksi-list"></ul>
+
+    <h3>Pembayaran</h3>
+    <label for="bayar">Jumlah Bayar:</label>
+    <input type="number" id="bayar" placeholder="Jumlah Bayar"><br><br>
+
+    <button onclick="prosesPembayaran()">Proses Pembayaran</button><br><br>
+
+    <p id="kembalian">Kembalian: 0</p>
+
+    <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+// Menyimpan database menggunakan IndexedDB
+let db;
+
+// Membuka atau membuat database
+let request = indexedDB.open("KasirDB", 1);
+
+request.onerror = function(event) {
+    alert("Database gagal dibuka!");
+};
+
+request.onsuccess = function(event) {
+    db = event.target.result;
+    console.log("Database berhasil dibuka!");
+    loadData();
+};
+
+// Membuat object store untuk produk, transaksi, dan riwayat
+request.onupgradeneeded = function(event) {
+    let db = event.target.result;
+
+    // Menyimpan produk
+    if (!db.objectStoreNames.contains("produk")) {
+        let produkStore = db.createObjectStore("produk", { keyPath: "id", autoIncrement: true });
+        produkStore.createIndex("nama", "nama", { unique: false });
+    }
+
+    // Menyimpan transaksi
+    if (!db.objectStoreNames.contains("transaksi")) {
+        db.createObjectStore("transaksi", { keyPath: "id", autoIncrement: true });
+    }
+
+    // Menyimpan riwayat pembayaran
+    if (!db.objectStoreNames.contains("riwayatPembayaran")) {
+        db.createObjectStore("riwayatPembayaran", { keyPath: "id", autoIncrement: true });
+    }
+};
+
+// Fungsi untuk load data produk dari database
+function loadData() {
+    const transaction = db.transaction(["produk"], "readonly");
+    const store = transaction.objectStore("produk");
+    const request = store.getAll();
+
+    request.onsuccess = function(event) {
+        produkList = event.target.result;
+        tampilkanProduk();
+    };
+}
+
+// Produk List
+let produkList = [];
+let transaksiList = [];
+
+// Login
+function login() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    if (username === "admin" && password === "admin123") {
+        localStorage.setItem("role", "admin");
+        showAppPage();
+    } else if (username === "kasir" && password === "kasir123") {
+        localStorage.setItem("role", "kasir");
+        showAppPage();
+    } else {
+        alert("Username atau password salah!");
+    }
+}
+
+// Menampilkan halaman aplikasi setelah login
+function showAppPage() {
+    const role = localStorage.getItem("role");
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("appPage").style.display = "block";
+
+    if (role === "admin") {
+        document.getElementById("adminControls").style.display = "block";
+    } else {
+        document.getElementById("adminControls").style.display = "none";
+    }
+}
+
+// Logout
+function logout() {
+    localStorage.removeItem("role");
+    document.getElementById("loginPage").style.display = "block";
+    document.getElementById("appPage").style.display = "none";
+}
+
+// Menambahkan produk
+function tambahProduk() {
+    const nama = document.getElementById("nama_produk").value;
+    const harga = parseFloat(document.getElementById("harga").value);
+    const stok = parseInt(document.getElementById("stok").value);
+
+    if (nama && harga > 0 && stok > 0) {
+        let produk = { nama, harga, stok };
+        const transaction = db.transaction(["produk"], "readwrite");
+        const store = transaction.objectStore("produk");
+        store.add(produk);
+
+        transaction.oncomplete = function() {
+            alert("Produk berhasil ditambahkan!");
+            loadData();
+        };
+    } else {
+        alert("Input produk tidak valid!");
+    }
+}
+
+// Menampilkan produk yang ada di database
+function tampilkanProduk() {
+    const produkListElement = document.getElementById("produk-list");
+    produkListElement.innerHTML = ""; // Reset daftar produk
+
+    produkList.forEach((produk, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `ID: ${produk.id}, Nama: ${produk.nama}, Harga: ${produk.harga}, Stok: ${produk.stok}`;
+        produkListElement.appendChild(li);
+    });
+}
+
+// Proses transaksi
+function prosesTransaksi() {
+    const produkId = parseInt(document.getElementById("produk_id").value);
+    const jumlah = parseInt(document.getElementById("jumlah").value);
+    const diskon = parseInt(document.getElementById("diskon").value);
+
+    const produk = produkList.find(p => p.id === produkId);
+    if (produk && produk.stok >= jumlah) {
+        const total = hitungTotal(produk, jumlah, diskon);
+        transaksiList.push({ produk, jumlah, diskon, total });
+
+        // Update stok produk
+        produk.stok -= jumlah;
+        const transaction = db.transaction(["produk"], "readwrite");
+        const store = transaction.objectStore("produk");
+        store.put(produk);
+
+        alert(`Transaksi berhasil! Total: ${total}`);
+    } else {
+        alert("Stok tidak cukup atau produk tidak ditemukan!");
+    }
+}
+
+// Menghitung total harga setelah diskon dan pajak
+function hitungTotal(produk, jumlah, diskon) {
+    const harga = produk.harga * jumlah;
+    const diskonAmount = harga * (diskon / 100);
+    const totalSetelahDiskon = harga - diskonAmount;
+    const pajak = totalSetelahDiskon * 0.1; // Pajak 10%
+    return totalSetelahDiskon + pajak;
+}
+
+// Pembayaran
+function prosesPembayaran() {
+    const bayar = parseFloat(document.getElementById("bayar").value);
+    const totalBelanja = transaksiList.reduce((total, transaksi) => total + transaksi.total, 0);
+    const kembalian = bayar - totalBelanja;
+
+    if (kembalian >= 0) {
+        alert(`Pembayaran berhasil! Kembalian: ${kembalian}`);
+        simpanRiwayatPembayaran(bayar, totalBelanja, kembalian);
+    } else {
+        alert("Jumlah bayar tidak cukup!");
+    }
+}
+
+// Simpan riwayat pembayaran
+function simpanRiwayatPembayaran(bayar, totalBelanja, kembalian) {
+    const riwayat = { bayar, totalBelanja, kembalian, tanggal: new Date() };
+    const transaction = db.transaction(["riwayatPembayaran"], "readwrite");
+    const store = transaction.objectStore("riwayatPembayaran");
+    store.add(riwayat);
+}
+
+</script>
+
 </body>
 </html>
