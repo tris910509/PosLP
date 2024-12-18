@@ -3,9 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kasir Aplikasi</title>
+    <title>Aplikasi Kasir</title>
     <style>
-        /* Style for notification */
+        /* Styling elements */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #login-form, #register-form, #transaksi-form, #suplier-form, #produk-form, #riwayat-transaksi {
+            margin-top: 20px;
+        }
         #notifikasi {
             display: none;
             background-color: #4CAF50;
@@ -16,21 +23,28 @@
             right: 10px;
             border-radius: 5px;
         }
-
-        /* Style for simple form and menu */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+        ul {
+            list-style-type: none;
+            padding-left: 0;
         }
-        #login-form, #register-form, #transaksi-form, #suplier-form, #suplier-list, #riwayat-transaksi {
-            margin-top: 20px;
+        li {
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
 
-<!-- Form Pendaftaran -->
-<div id="register-form">
+<!-- Login Form -->
+<div id="login-form">
+    <h2>Login</h2>
+    <input type="text" id="login-username" placeholder="Username" required>
+    <input type="password" id="login-password" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+    <p>Belum punya akun? <a href="javascript:void(0);" onclick="showRegisterForm()">Daftar</a></p>
+</div>
+
+<!-- Register Form -->
+<div id="register-form" style="display:none;">
     <h2>Daftar Pengguna Baru</h2>
     <input type="text" id="register-username" placeholder="Username" required>
     <input type="password" id="register-password" placeholder="Password" required>
@@ -39,47 +53,47 @@
     <p>Sudah punya akun? <a href="javascript:void(0);" onclick="showLoginForm()">Login</a></p>
 </div>
 
-<!-- Form Login -->
-<div id="login-form" style="display:none;">
-    <h2>Login</h2>
-    <input type="text" id="login-username" placeholder="Username" required>
-    <input type="password" id="login-password" placeholder="Password" required>
-    <button onclick="login()">Login</button>
-    <p>Belum punya akun? <a href="javascript:void(0);" onclick="showRegisterForm()">Daftar</a></p>
-</div>
-
 <!-- Notifikasi -->
 <div id="notifikasi">Transaksi berhasil!</div>
 
-<!-- Menu Admin, Kasir, Pelanggan -->
-<ul>
+<!-- Menu Admin dan Kasir -->
+<ul id="menu">
     <li id="admin-menu" style="display:none;">
-        <a href="javascript:void(0);" onclick="showSuplierForm()">Manajemen Suplier</a>
+        <a href="javascript:void(0);" onclick="showSuplierForm()">Manajemen Suplier</a><br>
+        <a href="javascript:void(0);" onclick="showProdukForm()">Manajemen Produk</a><br>
+        <a href="javascript:void(0);" onclick="showRiwayatTransaksi()">Riwayat Transaksi</a>
     </li>
     <li id="kasir-menu" style="display:none;">
-        <a href="javascript:void(0);" onclick="showTransaksiForm()">Transaksi Kasir</a>
+        <a href="javascript:void(0);" onclick="showTransaksiForm()">Transaksi Kasir</a><br>
+        <a href="javascript:void(0);" onclick="showRiwayatTransaksi()">Riwayat Transaksi</a>
     </li>
     <li id="pelanggan-menu" style="display:none;">
         <a href="javascript:void(0);" onclick="showRiwayatTransaksi()">Riwayat Transaksi</a>
     </li>
 </ul>
 
-<!-- Suplier Form -->
+<!-- Suplier Management Form -->
 <div id="suplier-form" style="display:none;">
     <h3>Tambah Suplier</h3>
     <label for="suplier-nama">Nama Suplier</label>
     <input type="text" id="suplier-nama" required>
     <label for="suplier-alamat">Alamat</label>
     <input type="text" id="suplier-alamat" required>
-    <label for="suplier-telepon">Nomor Telepon</label>
+    <label for="suplier-telepon">Telepon</label>
     <input type="text" id="suplier-telepon" required>
     <button onclick="tambahSuplier()">Tambah Suplier</button>
 </div>
 
-<!-- Suplier List -->
-<div id="suplier-list" style="display:none;">
-    <h3>Daftar Suplier</h3>
-    <ul id="suplier-ul"></ul>
+<!-- Produk Management Form -->
+<div id="produk-form" style="display:none;">
+    <h3>Tambah Produk</h3>
+    <label for="produk-nama">Nama Produk</label>
+    <input type="text" id="produk-nama" required>
+    <label for="produk-harga">Harga Produk</label>
+    <input type="number" id="produk-harga" required>
+    <label for="produk-stok">Stok</label>
+    <input type="number" id="produk-stok" required>
+    <button onclick="tambahProduk()">Tambah Produk</button>
 </div>
 
 <!-- Transaksi Form -->
@@ -117,6 +131,9 @@
         }
         if (!db.objectStoreNames.contains("suplier")) {
             const suplierStore = db.createObjectStore("suplier", { keyPath: "id", autoIncrement: true });
+        }
+        if (!db.objectStoreNames.contains("produk")) {
+            const produkStore = db.createObjectStore("produk", { keyPath: "id", autoIncrement: true });
         }
         if (!db.objectStoreNames.contains("transaksi")) {
             const transaksiStore = db.createObjectStore("transaksi", { keyPath: "id", autoIncrement: true });
@@ -159,7 +176,7 @@
         const user = {
             username: username,
             password: password,
-            role: "Pelanggan" // Set default role as "Pelanggan", this could be changed later
+            role: "Pelanggan" // Default role is Pelanggan
         };
 
         const request = store.add(user);
@@ -174,10 +191,20 @@
         };
     }
 
-    // Fungsi untuk login
+    // Fungsi login
     function login() {
         const username = document.getElementById("login-username").value;
         const password = document.getElementById("login-password").value;
+
+        // Hardcoded Admin credentials
+        const adminUsername = "admin";
+        const adminPassword = "admin123"; // Admin password yang telah ditentukan
+
+        if (username === adminUsername && password === adminPassword) {
+            localStorage.setItem("role", "Admin");
+            showDashboard("Admin");
+            return;
+        }
 
         const transaction = db.transaction(["users"], "readonly");
         const store = transaction.objectStore("users");
@@ -187,7 +214,7 @@
             const user = event.target.result;
             if (user && user.password === password) {
                 localStorage.setItem("role", user.role);
-                tampilkanDashboard(user.role);
+                showDashboard(user.role);
             } else {
                 alert("Username atau password salah");
             }
@@ -198,10 +225,11 @@
         };
     }
 
-    // Tampilkan Dashboard berdasarkan Role
-    function tampilkanDashboard(role) {
+    // Fungsi menampilkan dashboard berdasarkan role
+    function showDashboard(role) {
         document.getElementById("login-form").style.display = "none";
         document.getElementById("register-form").style.display = "none";
+        const menu = document.getElementById("menu");
 
         if (role === "Admin") {
             document.getElementById("admin-menu").style.display = "block";
@@ -211,14 +239,14 @@
             document.getElementById("admin-menu").style.display = "none";
             document.getElementById("kasir-menu").style.display = "block";
             document.getElementById("pelanggan-menu").style.display = "none";
-        } else if (role === "Pelanggan") {
+        } else {
             document.getElementById("admin-menu").style.display = "none";
             document.getElementById("kasir-menu").style.display = "none";
             document.getElementById("pelanggan-menu").style.display = "block";
         }
     }
 
-    // Fungsi untuk menambahkan suplier
+    // Fungsi tambah suplier
     function tambahSuplier() {
         const nama = document.getElementById("suplier-nama").value;
         const alamat = document.getElementById("suplier-alamat").value;
@@ -227,42 +255,59 @@
         const transaction = db.transaction(["suplier"], "readwrite");
         const store = transaction.objectStore("suplier");
         const suplier = { nama: nama, alamat: alamat, telepon: telepon };
+
         const request = store.add(suplier);
 
         request.onsuccess = function () {
             alert("Suplier berhasil ditambahkan!");
-            showSuplierList();
+            tampilkanSuplierList();
         };
 
         request.onerror = function () {
-            alert("Gagal menambahkan suplier!");
+            alert("Gagal menambah suplier!");
         };
     }
 
-    // Fungsi untuk menampilkan daftar suplier
-    function showSuplierList() {
-        document.getElementById("suplier-form").style.display = "none";
-        document.getElementById("suplier-list").style.display = "block";
-
+    // Fungsi menampilkan daftar suplier
+    function tampilkanSuplierList() {
         const transaction = db.transaction(["suplier"], "readonly");
         const store = transaction.objectStore("suplier");
         const request = store.getAll();
 
         request.onsuccess = function (e) {
             const supliers = e.target.result;
-            const suplierUl = document.getElementById("suplier-ul");
-            suplierUl.innerHTML = "";
+            const ul = document.createElement("ul");
             supliers.forEach(function (suplier) {
                 const li = document.createElement("li");
                 li.textContent = `Nama: ${suplier.nama}, Alamat: ${suplier.alamat}, Telepon: ${suplier.telepon}`;
-                suplierUl.appendChild(li);
+                ul.appendChild(li);
             });
+
+            document.getElementById("suplier-form").style.display = "none";
+            document.getElementById("suplier-list").appendChild(ul);
+            document.getElementById("suplier-list").style.display = "block";
         };
     }
 
-    // Fungsi untuk menampilkan form transaksi
-    function showTransaksiForm() {
-        document.getElementById("transaksi-form").style.display = "block";
+    // Fungsi tambah produk
+    function tambahProduk() {
+        const namaProduk = document.getElementById("produk-nama").value;
+        const harga = document.getElementById("produk-harga").value;
+        const stok = document.getElementById("produk-stok").value;
+
+        const transaction = db.transaction(["produk"], "readwrite");
+        const store = transaction.objectStore("produk");
+        const produk = { nama: namaProduk, harga: harga, stok: stok };
+
+        const request = store.add(produk);
+
+        request.onsuccess = function () {
+            alert("Produk berhasil ditambahkan!");
+        };
+
+        request.onerror = function () {
+            alert("Gagal menambah produk!");
+        };
     }
 
     // Fungsi untuk memproses transaksi
@@ -274,7 +319,13 @@
 
         const transaction = db.transaction(["transaksi"], "readwrite");
         const store = transaction.objectStore("transaksi");
-        const transaksi = { produk: produk, jumlah: jumlah, diskon: diskon, ongkir: ongkir, tanggal: new Date() };
+        const transaksi = {
+            produk: produk,
+            jumlah: jumlah,
+            diskon: diskon,
+            ongkir: ongkir,
+            tanggal: new Date()
+        };
 
         const request = store.add(transaksi);
 
@@ -311,7 +362,7 @@
     // Fungsi menampilkan notifikasi
     function tampilkanNotifikasi(message) {
         const notifikasi = document.getElementById("notifikasi");
-        notifikasi.innerHTML = message;
+        notifikasi.textContent = message;
         notifikasi.style.display = "block";
         setTimeout(function () {
             notifikasi.style.display = "none";
