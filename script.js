@@ -1,103 +1,90 @@
-// Mendapatkan elemen dari DOM
-const formProduk = document.getElementById("form-tambah-produk");
-const produkList = document.getElementById("produk-list");
-const kategoriList = document.getElementById("kategori-list");
-const supplierList = document.getElementById("supplier-list");
-const transaksiList = document.getElementById("laporan-list");
-const penggunaList = document.getElementById("pengguna-list");
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let currentUser = null;
+let products = JSON.parse(localStorage.getItem("products")) || [];
+let categories = JSON.parse(localStorage.getItem("categories")) || [];
 
-let produkArray = JSON.parse(localStorage.getItem("produk")) || [];
-let kategoriArray = JSON.parse(localStorage.getItem("kategori")) || [];
-let supplierArray = JSON.parse(localStorage.getItem("supplier")) || [];
-let transaksiArray = JSON.parse(localStorage.getItem("transaksi")) || [];
-let penggunaArray = JSON.parse(localStorage.getItem("pengguna")) || [];
-
-// Fungsi untuk menampilkan produk
-function tampilkanProduk() {
-    produkList.innerHTML = "";
-    produkArray.forEach((produk, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-            <strong>${produk.nama}</strong> - Rp. ${produk.harga}
-            <button onclick="hapusProduk(${index})">Hapus</button>
-        `;
-        produkList.appendChild(li);
-    });
+function showLoginForm() {
+    document.getElementById("login-register").style.display = "block";
+    document.getElementById("register-form").style.display = "none";
 }
 
-// Fungsi untuk menambahkan produk
-formProduk.addEventListener("submit", function (e) {
-    e.preventDefault();
+function showRegisterForm() {
+    document.getElementById("login-register").style.display = "block";
+    document.getElementById("login-form").style.display = "none";
+}
 
-    const namaProduk = document.getElementById("nama-produk").value;
-    const hargaProduk = document.getElementById("harga-produk").value;
+function handleLogin(event) {
+    event.preventDefault();
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const user = users.find(user => user.email === email && user.password === password);
 
-    if (namaProduk && hargaProduk) {
-        const produkBaru = {
-            nama: namaProduk,
-            harga: parseInt(hargaProduk),
-        };
-
-        produkArray.push(produkBaru);
-        localStorage.setItem("produk", JSON.stringify(produkArray));
-
-        // Reset form input
-        document.getElementById("nama-produk").value = "";
-        document.getElementById("harga-produk").value = "";
-
-        tampilkanProduk();
+    if (user) {
+        currentUser = user;
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        document.getElementById("login-register").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+    } else {
+        alert("Email atau Password salah!");
     }
-});
-
-// Fungsi untuk menghapus produk
-function hapusProduk(index) {
-    produkArray.splice(index, 1);
-    localStorage.setItem("produk", JSON.stringify(produkArray));
-    tampilkanProduk();
 }
 
-// Menampilkan data pada halaman kategori, supplier, dan laporan
-function tampilkanKategori() {
-    kategoriList.innerHTML = "";
-    kategoriArray.forEach((kategori, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `<strong>${kategori.nama}</strong>`;
-        kategoriList.appendChild(li);
-    });
+function handleRegister(event) {
+    event.preventDefault();
+    const email = document.getElementById("new-email").value;
+    const password = document.getElementById("new-password").value;
+
+    if (users.some(user => user.email === email)) {
+        alert("Email sudah terdaftar!");
+        return;
+    }
+
+    const newUser = { email, password, role: "user" };
+    users.push(newUser);
+    localStorage.setItem("users", JSON.stringify(users));
+    alert("Pendaftaran berhasil! Silakan login.");
+    showLoginForm();
 }
 
-function tampilkanSupplier() {
-    supplierList.innerHTML = "";
-    supplierArray.forEach((supplier, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `<strong>${supplier.nama}</strong>`;
-        supplierList.appendChild(li);
-    });
+function showProducts() {
+    document.getElementById("products-section").style.display = "block";
+    let productHTML = products.map(product => `
+        <div>
+            <h3>${product.name}</h3>
+            <p>Harga: ${product.price}</p>
+            <button onclick="editProduct('${product.id}')">Edit</button>
+        </div>
+    `).join("");
+    document.getElementById("products-list").innerHTML = productHTML;
 }
 
-function tampilkanLaporan() {
-    transaksiList.innerHTML = "";
-    transaksiArray.forEach((transaksi, index) => {
-        const div = document.createElement("div");
-        div.innerHTML = `
-            <p>Transaksi ${index + 1} | Produk: ${transaksi.produk} | Jumlah: ${transaksi.jumlah} | Total Bayar: Rp. ${transaksi.totalBayar} | Tanggal: ${transaksi.tanggal}</p>
-        `;
-        transaksiList.appendChild(div);
-    });
+function addProduct() {
+    const productName = prompt("Masukkan nama produk");
+    const productPrice = prompt("Masukkan harga produk");
+    const newProduct = { id: Date.now().toString(), name: productName, price: productPrice };
+    products.push(newProduct);
+    localStorage.setItem("products", JSON.stringify(products));
+    showProducts();
 }
 
-function tampilkanPengguna() {
-    penggunaList.innerHTML = "";
-    penggunaArray.forEach((pengguna, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `<strong>${pengguna.nama}</strong>`;
-        penggunaList.appendChild(li);
-    });
+function showCategories() {
+    document.getElementById("categories-section").style.display = "block";
+    let categoryHTML = categories.map(category => `
+        <div>
+            <h3>${category.name}</h3>
+        </div>
+    `).join("");
+    document.getElementById("categories-list").innerHTML = categoryHTML;
 }
 
-// Memanggil fungsi untuk menampilkan data saat halaman dimuat
-if (produkList) tampilkanProduk();
-if (kategoriList) tampilkanKategori();
-if (supplierList) tampilkanSupplier();
-if (transaksiList) tampilkanLaporan();
-if (penggunaList) tampilkanPengguna();
+function addCategory() {
+    const categoryName = prompt("Masukkan nama kategori");
+    const newCategory = { id: Date.now().toString(), name: categoryName };
+    categories.push(newCategory);
+    localStorage.setItem("categories", JSON.stringify(categories));
+    showCategories();
+}
+
+// Event listeners for login and register
+document.getElementById("login-form").addEventListener("submit", handleLogin);
+document.getElementById("register-form").addEventListener("submit", handleRegister);
