@@ -55,6 +55,37 @@
             <div id="categories-list"></div>
         </section>
 
+        
+<!-- Manajemen Transaksi -->
+<section id="transactions-section" style="display: none;">
+    <h2>Manajemen Transaksi</h2>
+    <button onclick="addTransaction()">Tambah Transaksi</button>
+    <div id="transactions-list"></div>
+</section>
+
+<!-- Form untuk Tambah Transaksi -->
+<section id="add-transaction-section" style="display: none;">
+    <h2>Tambah Transaksi</h2>
+    <form id="transaction-form">
+        <label for="product">Pilih Produk:</label>
+        <select id="product">
+            <option value="">--Pilih Produk--</option>
+        </select>
+        
+        <label for="quantity">Jumlah:</label>
+        <input type="number" id="quantity" placeholder="Jumlah" required min="1">
+
+        <label for="payment-method">Metode Pembayaran:</label>
+        <select id="payment-method">
+            <option value="cash">Tunai</option>
+            <option value="card">Kartu Kredit</option>
+        </select>
+
+        <button type="submit">Selesaikan Transaksi</button>
+        <button type="button" onclick="cancelTransaction()">Batal</button>
+    </form>
+</section>
+
         <!-- Lain-lain... -->
 
     </main>
