@@ -34,3 +34,15 @@ button {
 button:hover {
     background-color: #218838;
 }
+
+#transactions-section {
+    margin-top: 20px;
+}
+
+#add-transaction-section {
+    margin-top: 20px;
+}
+
+button {
+    margin-top: 10px;
+}
