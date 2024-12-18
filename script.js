@@ -1,303 +1,150 @@
-let users = JSON.parse(localStorage.getItem("users")) || [];
-let currentUser = null;
-let products = JSON.parse(localStorage.getItem("products")) || [];
-let categories = JSON.parse(localStorage.getItem("categories")) || [];
+let db;
+let barangStore;
+let transaksiStore;
 
-function showLoginForm() {
-    document.getElementById("login-register").style.display = "block";
-    document.getElementById("register-form").style.display = "none";
-}
-
-function showRegisterForm() {
-    document.getElementById("login-register").style.display = "block";
-    document.getElementById("login-form").style.display = "none";
-}
-
-function handleLogin(event) {
-    event.preventDefault();
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const user = users.find(user => user.email === email && user.password === password);
-
-    if (user) {
-        currentUser = user;
-        localStorage.setItem("currentUser", JSON.stringify(user));
-        document.getElementById("login-register").style.display = "none";
-        document.getElementById("dashboard").style.display = "block";
-    } else {
-        alert("Email atau Password salah!");
-    }
-}
-
-function handleRegister(event) {
-    event.preventDefault();
-    const email = document.getElementById("new-email").value;
-    const password = document.getElementById("new-password").value;
-
-    if (users.some(user => user.email === email)) {
-        alert("Email sudah terdaftar!");
-        return;
-    }
-
-    const newUser = { email, password, role: "user" };
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-    alert("Pendaftaran berhasil! Silakan login.");
-    showLoginForm();
-}
-
-function showProducts() {
-    document.getElementById("products-section").style.display = "block";
-    let productHTML = products.map(product => `
-        <div>
-            <h3>${product.name}</h3>
-            <p>Harga: ${product.price}</p>
-            <button onclick="editProduct('${product.id}')">Edit</button>
-        </div>
-    `).join("");
-    document.getElementById("products-list").innerHTML = productHTML;
-}
-
-function addProduct() {
-    const productName = prompt("Masukkan nama produk");
-    const productPrice = prompt("Masukkan harga produk");
-    const newProduct = { id: Date.now().toString(), name: productName, price: productPrice };
-    products.push(newProduct);
-    localStorage.setItem("products", JSON.stringify(products));
-    showProducts();
-}
-
-function showCategories() {
-    document.getElementById("categories-section").style.display = "block";
-    let categoryHTML = categories.map(category => `
-        <div>
-            <h3>${category.name}</h3>
-        </div>
-    `).join("");
-    document.getElementById("categories-list").innerHTML = categoryHTML;
-}
-
-function addCategory() {
-    const categoryName = prompt("Masukkan nama kategori");
-    const newCategory = { id: Date.now().toString(), name: categoryName };
-    categories.push(newCategory);
-    localStorage.setItem("categories", JSON.stringify(categories));
-    showCategories();
-}
-
-// Event listeners for login and register
-document.getElementById("login-form").addEventListener("submit", handleLogin);
-document.getElementById("register-form").addEventListener("submit", handleRegister);
-let products = JSON.parse(localStorage.getItem("products")) || [];
-let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-
-
-
-function showTransactions() {
-    document.getElementById("transactions-section").style.display = "block";
-    let transactionHTML = transactions.map(transaction => `
-        <div>
-            <h3>Transaksi #${transaction.id}</h3>
-            <p>Produk: ${transaction.product.name} (x${transaction.quantity})</p>
-            <p>Total Harga: Rp ${transaction.totalPrice}</p>
-            <p>Metode Pembayaran: ${transaction.paymentMethod}</p>
-            <p>Status Pembayaran: ${transaction.status}</p>
-        </div>
-    `).join("");
-    document.getElementById("transactions-list").innerHTML = transactionHTML;
-}
-
-
-function populateProductList() {
-    const productSelect = document.getElementById("product");
-    products.forEach(product => {
-        const option = document.createElement("option");
-        option.value = product.id;
-        option.textContent = `${product.name} - Rp ${product.price}`;
-        productSelect.appendChild(option);
-    });
-}
-
-
-
-
-
-function addTransaction() {
-    document.getElementById("transactions-section").style.display = "none";
-    document.getElementById("add-transaction-section").style.display = "block";
-    populateProductList();
-}
-
-
-
-function handleTransaction(event) {
-    event.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
+    // Inisialisasi IndexedDB
+    const request = indexedDB.open("kasirDB", 1);
     
-    const productId = document.getElementById("product").value;
-    const quantity = parseInt(document.getElementById("quantity").value);
-    const paymentMethod = document.getElementById("payment-method").value;
+    request.onupgradeneeded = (event) => {
+        db = event.target.result;
+        barangStore = db.createObjectStore("barang", { keyPath: "id", autoIncrement: true });
+        barangStore.createIndex("nama", "nama", { unique: false });
 
-    const product = products.find(p => p.id === productId);
-    if (!product) {
-        alert("Produk tidak ditemukan!");
-        return;
-    }
-
-    const totalPrice = product.price * quantity;
-    const transaction = {
-        id: Date.now().toString(),
-        product: product,
-        quantity: quantity,
-        totalPrice: totalPrice,
-        paymentMethod: paymentMethod,
-        status: "Lunas"
+        transaksiStore = db.createObjectStore("transaksi", { keyPath: "id", autoIncrement: true });
+        transaksiStore.createIndex("tanggal", "tanggal", { unique: false });
     };
 
-    transactions.push(transaction);
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-
-    alert("Transaksi berhasil!");
-    showTransactions(); // Tampilkan daftar transaksi lagi
-    cancelTransaction();
-}
-
-function cancelTransaction() {
-    document.getElementById("add-transaction-section").style.display = "none";
-    document.getElementById("transactions-section").style.display = "block";
-}
-
-
-
-document.getElementById("transaction-form").addEventListener("submit", handleTransaction);
-
-
-const shippingCost = parseFloat(document.getElementById("shipping").value) || 0;
-const totalPrice = (product.price * quantity) + shippingCost;
-
-
-// Data pengguna di localStorage, dengan role admin atau user
-let users = JSON.parse(localStorage.getItem("users")) || [];
-let currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
-function handleRegister(event) {
-    event.preventDefault();
-    const email = document.getElementById("new-email").value;
-    const password = document.getElementById("new-password").value;
-    
-    // Jika ini adalah admin pertama yang mendaftar
-    const isAdmin = users.length === 0;  // admin pertama yang mendaftar
-    const role = isAdmin ? 'admin' : 'user';
-
-    const newUser = { email, password, role };
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-    alert("Pendaftaran berhasil! Silakan login.");
-    showLoginForm();
-}
-
-function handleLogin(event) {
-    event.preventDefault();
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const user = users.find(user => user.email === email && user.password === password);
-
-    if (user) {
-        currentUser = user;
-        localStorage.setItem("currentUser", JSON.stringify(user));
-        alert("Login berhasil!");
-        showDashboard(user.role); // Menampilkan dashboard sesuai role
-    } else {
-        alert("Email atau Password salah!");
-    }
-}
-
-function showDashboard(role) {
-    if (role === 'admin') {
-        // Admin dapat mengakses semua fitur
-        document.getElementById("admin-dashboard").style.display = "block";
-        document.getElementById("user-dashboard").style.display = "none";
-    } else {
-        // User biasa hanya bisa mengakses transaksi
-        document.getElementById("admin-dashboard").style.display = "none";
-        document.getElementById("user-dashboard").style.display = "block";
-    }
-}
-
-
-function showNotification(message, type = 'success') {
-    const notification = document.getElementById("notification");
-    const messageElement = document.getElementById("notification-message");
-    
-    messageElement.textContent = message;
-    notification.style.backgroundColor = type === 'success' ? '#4caf50' : '#f44336';  // Hijau untuk sukses, merah untuk error
-    notification.style.display = 'block';
-
-    // Sembunyikan setelah 3 detik
-    setTimeout(() => {
-        notification.style.display = 'none';
-    }, 3000);
-}
-
-
-showNotification("Transaksi berhasil diselesaikan!");
-
-
-function generateQRCode(transaction) {
-    const qrCodeContainer = document.getElementById("qrcode-container");
-    
-    const transactionData = {
-        id: transaction.id,
-        product: transaction.product.name,
-        quantity: transaction.quantity,
-        totalPrice: transaction.totalPrice
+    request.onsuccess = () => {
+        db = request.result;
+        loadBarang();
     };
 
-    const qrData = JSON.stringify(transactionData);
+    request.onerror = (event) => {
+        console.error("Error membuka database", event.target.error);
+    };
+});
 
-    // Generate QR Code
-    QRCode.toCanvas(qrCodeContainer, qrData, function (error) {
-        if (error) {
-            console.error(error);
-        } else {
-            console.log("QR Code berhasil dibuat!");
-        }
-    });
+// Fungsi untuk menambahkan barang ke database
+function tambahBarang() {
+    const nama = document.getElementById("namaBarang").value;
+    const harga = document.getElementById("hargaBarang").value;
+
+    if (nama && harga) {
+        const transaction = db.transaction(["barang"], "readwrite");
+        const store = transaction.objectStore("barang");
+
+        const barang = { nama: nama, harga: parseInt(harga) };
+        store.add(barang);
+
+        transaction.oncomplete = () => {
+            alert("Barang berhasil ditambahkan");
+            loadBarang();
+        };
+
+        transaction.onerror = (event) => {
+            console.error("Error menambahkan barang", event.target.error);
+        };
+    }
 }
 
+// Fungsi untuk memuat daftar barang
+function loadBarang() {
+    const transaction = db.transaction(["barang"], "readonly");
+    const store = transaction.objectStore("barang");
+    const request = store.getAll();
 
+    request.onsuccess = (event) => {
+        const listBarang = event.target.result;
+        const selectBarang = document.getElementById("selectBarang");
+        const listBarangElement = document.getElementById("listBarang");
+        
+        listBarangElement.innerHTML = "";
+        selectBarang.innerHTML = "<option value=''>Pilih Barang</option>";
 
-// Contoh setelah transaksi selesai
-generateQRCode(transaction);
+        listBarang.forEach(barang => {
+            const listItem = document.createElement("li");
+            listItem.textContent = `${barang.nama} - Rp ${barang.harga}`;
+            listBarangElement.appendChild(listItem);
 
+            const option = document.createElement("option");
+            option.value = barang.id;
+            option.textContent = `${barang.nama} - Rp ${barang.harga}`;
+            selectBarang.appendChild(option);
+        });
+    };
 
+    request.onerror = (event) => {
+        console.error("Error memuat barang", event.target.error);
+    };
+}
 
+// Fungsi untuk menambah barang ke keranjang
+let keranjang = [];
+let total = 0;
 
+function tambahKeKeranjang() {
+    const selectBarang = document.getElementById("selectBarang");
+    const jumlah = document.getElementById("jumlahBarang").value;
 
+    const barangId = selectBarang.value;
+    if (barangId && jumlah) {
+        const transaction = db.transaction(["barang"], "readonly");
+        const store = transaction.objectStore("barang");
+        const request = store.get(Number(barangId));
 
+        request.onsuccess = (event) => {
+            const barang = event.target.result;
+            const subtotal = barang.harga * jumlah;
+            keranjang.push({ ...barang, jumlah, subtotal });
 
+            total += subtotal;
+            updateKeranjang();
+        };
 
+        request.onerror = (event) => {
+            console.error("Error menambahkan ke keranjang", event.target.error);
+        };
+    }
+}
 
+// Fungsi untuk menampilkan keranjang dan total harga
+function updateKeranjang() {
+    const keranjangElement = document.getElementById("keranjang");
+    const totalElement = document.getElementById("totalHarga");
 
+    keranjangElement.innerHTML = "";
+    keranjang.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.nama} x${item.jumlah} - Rp ${item.subtotal}`;
+        keranjangElement.appendChild(li);
+    });
 
+    totalElement.textContent = total;
+}
 
+// Fungsi untuk memproses transaksi
+function prosesTransaksi() {
+    const transaction = db.transaction(["transaksi"], "readwrite");
+    const store = transaction.objectStore("transaksi");
 
+    const tanggal = new Date().toISOString();
+    const transaksi = {
+        tanggal,
+        total,
+        detail: keranjang
+    };
 
+    store.add(transaksi);
 
+    transaction.oncomplete = () => {
+        alert("Transaksi berhasil diproses!");
+        keranjang = [];
+        total = 0;
+        updateKeranjang();
+    };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    transaction.onerror = (event) => {
+        console.error("Error memproses transaksi", event.target.error);
+    };
+}
