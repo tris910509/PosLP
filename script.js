@@ -91,3 +91,119 @@ document.getElementById("register-form").addEventListener("submit", handleRegist
 let products = JSON.parse(localStorage.getItem("products")) || [];
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
+
+
+function showTransactions() {
+    document.getElementById("transactions-section").style.display = "block";
+    let transactionHTML = transactions.map(transaction => `
+        <div>
+            <h3>Transaksi #${transaction.id}</h3>
+            <p>Produk: ${transaction.product.name} (x${transaction.quantity})</p>
+            <p>Total Harga: Rp ${transaction.totalPrice}</p>
+            <p>Metode Pembayaran: ${transaction.paymentMethod}</p>
+            <p>Status Pembayaran: ${transaction.status}</p>
+        </div>
+    `).join("");
+    document.getElementById("transactions-list").innerHTML = transactionHTML;
+}
+
+
+function populateProductList() {
+    const productSelect = document.getElementById("product");
+    products.forEach(product => {
+        const option = document.createElement("option");
+        option.value = product.id;
+        option.textContent = `${product.name} - Rp ${product.price}`;
+        productSelect.appendChild(option);
+    });
+}
+
+
+
+
+
+function addTransaction() {
+    document.getElementById("transactions-section").style.display = "none";
+    document.getElementById("add-transaction-section").style.display = "block";
+    populateProductList();
+}
+
+
+
+function handleTransaction(event) {
+    event.preventDefault();
+    
+    const productId = document.getElementById("product").value;
+    const quantity = parseInt(document.getElementById("quantity").value);
+    const paymentMethod = document.getElementById("payment-method").value;
+
+    const product = products.find(p => p.id === productId);
+    if (!product) {
+        alert("Produk tidak ditemukan!");
+        return;
+    }
+
+    const totalPrice = product.price * quantity;
+    const transaction = {
+        id: Date.now().toString(),
+        product: product,
+        quantity: quantity,
+        totalPrice: totalPrice,
+        paymentMethod: paymentMethod,
+        status: "Lunas"
+    };
+
+    transactions.push(transaction);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+
+    alert("Transaksi berhasil!");
+    showTransactions(); // Tampilkan daftar transaksi lagi
+    cancelTransaction();
+}
+
+function cancelTransaction() {
+    document.getElementById("add-transaction-section").style.display = "none";
+    document.getElementById("transactions-section").style.display = "block";
+}
+
+
+
+document.getElementById("transaction-form").addEventListener("submit", handleTransaction);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
