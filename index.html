@@ -3,28 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Kasir Sederhana</title>
+    <title>POS Toko</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div id="app">
-        <h1>Aplikasi Kasir Sederhana</h1>
-        <div id="barang">
-            <h2>Data Barang</h2>
-            <input type="text" id="namaBarang" placeholder="Nama Barang">
-            <input type="number" id="hargaBarang" placeholder="Harga Barang">
-            <button onclick="tambahBarang()">Tambah Barang</button>
-            <ul id="listBarang"></ul>
+    <div class="container">
+        <h1>Point of Sale (POS) Toko</h1>
+
+        <!-- Form login -->
+        <div id="login-section">
+            <h2>Login</h2>
+            <label for="username">Username:</label>
+            <input type="text" id="username">
+            <label for="password">Password:</label>
+            <input type="password" id="password">
+            <button id="login-btn">Login</button>
         </div>
 
-        <div id="transaksi">
-            <h2>Transaksi</h2>
-            <select id="selectBarang"></select>
-            <input type="number" id="jumlahBarang" placeholder="Jumlah">
-            <button onclick="tambahKeKeranjang()">Tambah ke Keranjang</button>
-            <ul id="keranjang"></ul>
-            <h3>Total: Rp <span id="totalHarga">0</span></h3>
-            <button onclick="prosesTransaksi()">Proses Transaksi</button>
+        <!-- Display setelah login -->
+        <div id="pos-section" style="display:none;">
+            <h2>Selamat datang, <span id="user-role"></span></h2>
+            
+            <!-- Filter Kategori Produk -->
+            <div>
+                <h3>Filter Produk</h3>
+                <select id="category-filter">
+                    <option value="">Pilih Kategori</option>
+                    <!-- Kategori akan dimuat disini -->
+                </select>
+            </div>
+
+            <!-- Daftar Produk -->
+            <div class="product-list">
+                <h3>Produk</h3>
+                <div id="product-container"></div>
+            </div>
+
+            <!-- Keranjang -->
+            <div class="cart">
+                <h3>Keranjang</h3>
+                <ul id="cart-items"></ul>
+                <p><strong>Total: </strong><span id="total-price">Rp 0</span></p>
+                <label for="payment-method">Metode Pembayaran:</label>
+                <select id="payment-method">
+                    <option value="cash">Tunai</option>
+                    <option value="card">Kartu Kredit</option>
+                    <option value="transfer">Transfer Bank</option>
+                </select>
+                <button id="checkout-btn">Checkout</button>
+            </div>
+
+            <!-- Laporan Transaksi -->
+            <div class="report">
+                <h3>Laporan Transaksi</h3>
+                <canvas id="salesChart"></canvas>
+            </div>
         </div>
     </div>
 
