@@ -16,16 +16,36 @@
             right: 10px;
             border-radius: 5px;
         }
+
+        /* Style for simple form and menu */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #login-form, #register-form, #transaksi-form, #suplier-form, #suplier-list, #riwayat-transaksi {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 
-<!-- Login Form -->
-<div id="login-form">
+<!-- Form Pendaftaran -->
+<div id="register-form">
+    <h2>Daftar Pengguna Baru</h2>
+    <input type="text" id="register-username" placeholder="Username" required>
+    <input type="password" id="register-password" placeholder="Password" required>
+    <input type="password" id="register-password-confirm" placeholder="Konfirmasi Password" required>
+    <button onclick="register()">Daftar</button>
+    <p>Sudah punya akun? <a href="javascript:void(0);" onclick="showLoginForm()">Login</a></p>
+</div>
+
+<!-- Form Login -->
+<div id="login-form" style="display:none;">
     <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username" required>
-    <input type="password" id="password" placeholder="Password" required>
+    <input type="text" id="login-username" placeholder="Username" required>
+    <input type="password" id="login-password" placeholder="Password" required>
     <button onclick="login()">Login</button>
+    <p>Belum punya akun? <a href="javascript:void(0);" onclick="showRegisterForm()">Daftar</a></p>
 </div>
 
 <!-- Notifikasi -->
@@ -34,15 +54,33 @@
 <!-- Menu Admin, Kasir, Pelanggan -->
 <ul>
     <li id="admin-menu" style="display:none;">
-        <a href="#">Dashboard Admin</a>
+        <a href="javascript:void(0);" onclick="showSuplierForm()">Manajemen Suplier</a>
     </li>
     <li id="kasir-menu" style="display:none;">
-        <a href="#">Transaksi Kasir</a>
+        <a href="javascript:void(0);" onclick="showTransaksiForm()">Transaksi Kasir</a>
     </li>
     <li id="pelanggan-menu" style="display:none;">
-        <a href="#">Belanja Produk</a>
+        <a href="javascript:void(0);" onclick="showRiwayatTransaksi()">Riwayat Transaksi</a>
     </li>
 </ul>
+
+<!-- Suplier Form -->
+<div id="suplier-form" style="display:none;">
+    <h3>Tambah Suplier</h3>
+    <label for="suplier-nama">Nama Suplier</label>
+    <input type="text" id="suplier-nama" required>
+    <label for="suplier-alamat">Alamat</label>
+    <input type="text" id="suplier-alamat" required>
+    <label for="suplier-telepon">Nomor Telepon</label>
+    <input type="text" id="suplier-telepon" required>
+    <button onclick="tambahSuplier()">Tambah Suplier</button>
+</div>
+
+<!-- Suplier List -->
+<div id="suplier-list" style="display:none;">
+    <h3>Daftar Suplier</h3>
+    <ul id="suplier-ul"></ul>
+</div>
 
 <!-- Transaksi Form -->
 <div id="transaksi-form" style="display:none;">
@@ -73,54 +111,73 @@
 
     request.onupgradeneeded = function (e) {
         db = e.target.result;
-        if (!db.objectStoreNames.contains("produk")) {
-            const produkStore = db.createObjectStore("produk", { keyPath: "id", autoIncrement: true });
-            produkStore.createIndex("nama", "nama", { unique: true });
-        }
-        if (!db.objectStoreNames.contains("transaksi")) {
-            const transaksiStore = db.createObjectStore("transaksi", { keyPath: "id", autoIncrement: true });
-        }
         if (!db.objectStoreNames.contains("users")) {
             const usersStore = db.createObjectStore("users", { keyPath: "username" });
             usersStore.createIndex("username", "username", { unique: true });
+        }
+        if (!db.objectStoreNames.contains("suplier")) {
+            const suplierStore = db.createObjectStore("suplier", { keyPath: "id", autoIncrement: true });
+        }
+        if (!db.objectStoreNames.contains("transaksi")) {
+            const transaksiStore = db.createObjectStore("transaksi", { keyPath: "id", autoIncrement: true });
         }
     };
 
     request.onsuccess = function (e) {
         db = e.target.result;
-        // Insert sample data if not present
-        checkAndInsertSampleData();
     };
 
     request.onerror = function (e) {
         console.error("Error opening IndexedDB", e);
     };
 
-    function checkAndInsertSampleData() {
-        const transaction = db.transaction(["users"], "readonly");
-        const store = transaction.objectStore("users");
-        const request = store.get("admin");
+    // Fungsi Menampilkan Form Pendaftaran
+    function showRegisterForm() {
+        document.getElementById("login-form").style.display = "none";
+        document.getElementById("register-form").style.display = "block";
+    }
 
-        request.onsuccess = function (event) {
-            if (!event.target.result) {
-                // Insert default user (admin)
-                const admin = {
-                    username: "admin",
-                    password: "admin123",
-                    role: "Admin"
-                };
-                const addRequest = store.add(admin);
-                addRequest.onsuccess = function () {
-                    console.log("Admin added");
-                };
-            }
+    // Fungsi Menampilkan Form Login
+    function showLoginForm() {
+        document.getElementById("register-form").style.display = "none";
+        document.getElementById("login-form").style.display = "block";
+    }
+
+    // Fungsi untuk mendaftar pengguna
+    function register() {
+        const username = document.getElementById("register-username").value;
+        const password = document.getElementById("register-password").value;
+        const confirmPassword = document.getElementById("register-password-confirm").value;
+
+        if (password !== confirmPassword) {
+            alert("Password dan konfirmasi password tidak cocok!");
+            return;
+        }
+
+        const transaction = db.transaction(["users"], "readwrite");
+        const store = transaction.objectStore("users");
+        const user = {
+            username: username,
+            password: password,
+            role: "Pelanggan" // Set default role as "Pelanggan", this could be changed later
+        };
+
+        const request = store.add(user);
+
+        request.onsuccess = function () {
+            alert("Pendaftaran berhasil!");
+            showLoginForm();
+        };
+
+        request.onerror = function () {
+            alert("Gagal mendaftar, username sudah digunakan!");
         };
     }
 
-    // Login Function
+    // Fungsi untuk login
     function login() {
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
+        const username = document.getElementById("login-username").value;
+        const password = document.getElementById("login-password").value;
 
         const transaction = db.transaction(["users"], "readonly");
         const store = transaction.objectStore("users");
@@ -144,6 +201,7 @@
     // Tampilkan Dashboard berdasarkan Role
     function tampilkanDashboard(role) {
         document.getElementById("login-form").style.display = "none";
+        document.getElementById("register-form").style.display = "none";
 
         if (role === "Admin") {
             document.getElementById("admin-menu").style.display = "block";
@@ -160,41 +218,69 @@
         }
     }
 
-    // Fungsi untuk menampilkan notifikasi
-    function tampilkanNotifikasi(message) {
-        const notifikasi = document.getElementById("notifikasi");
-        notifikasi.innerHTML = message;
-        notifikasi.style.display = "block";
-        setTimeout(function () {
-            notifikasi.style.display = "none";
-        }, 3000);
+    // Fungsi untuk menambahkan suplier
+    function tambahSuplier() {
+        const nama = document.getElementById("suplier-nama").value;
+        const alamat = document.getElementById("suplier-alamat").value;
+        const telepon = document.getElementById("suplier-telepon").value;
+
+        const transaction = db.transaction(["suplier"], "readwrite");
+        const store = transaction.objectStore("suplier");
+        const suplier = { nama: nama, alamat: alamat, telepon: telepon };
+        const request = store.add(suplier);
+
+        request.onsuccess = function () {
+            alert("Suplier berhasil ditambahkan!");
+            showSuplierList();
+        };
+
+        request.onerror = function () {
+            alert("Gagal menambahkan suplier!");
+        };
     }
 
-    // Fungsi untuk proses transaksi
+    // Fungsi untuk menampilkan daftar suplier
+    function showSuplierList() {
+        document.getElementById("suplier-form").style.display = "none";
+        document.getElementById("suplier-list").style.display = "block";
+
+        const transaction = db.transaction(["suplier"], "readonly");
+        const store = transaction.objectStore("suplier");
+        const request = store.getAll();
+
+        request.onsuccess = function (e) {
+            const supliers = e.target.result;
+            const suplierUl = document.getElementById("suplier-ul");
+            suplierUl.innerHTML = "";
+            supliers.forEach(function (suplier) {
+                const li = document.createElement("li");
+                li.textContent = `Nama: ${suplier.nama}, Alamat: ${suplier.alamat}, Telepon: ${suplier.telepon}`;
+                suplierUl.appendChild(li);
+            });
+        };
+    }
+
+    // Fungsi untuk menampilkan form transaksi
+    function showTransaksiForm() {
+        document.getElementById("transaksi-form").style.display = "block";
+    }
+
+    // Fungsi untuk memproses transaksi
     function prosesTransaksi() {
         const produk = document.getElementById("produk").value;
-        const jumlah = parseInt(document.getElementById("jumlah").value);
-        const diskon = parseInt(document.getElementById("diskon").value) || 0;
-        const ongkir = parseInt(document.getElementById("ongkir").value) || 0;
-
-        const total = (jumlah * 1000) * (1 - diskon / 100) + ongkir; // Asumsi harga produk = 1000
-        const transaksi = {
-            produk,
-            jumlah,
-            diskon,
-            ongkir,
-            total,
-            status: "Tunggu Pembayaran",
-            tanggal: new Date()
-        };
+        const jumlah = document.getElementById("jumlah").value;
+        const diskon = document.getElementById("diskon").value || 0;
+        const ongkir = document.getElementById("ongkir").value || 0;
 
         const transaction = db.transaction(["transaksi"], "readwrite");
         const store = transaction.objectStore("transaksi");
+        const transaksi = { produk: produk, jumlah: jumlah, diskon: diskon, ongkir: ongkir, tanggal: new Date() };
+
         const request = store.add(transaksi);
 
         request.onsuccess = function () {
-            tampilkanNotifikasi("Transaksi berhasil diproses!");
-            updateTransaksiList();
+            alert("Transaksi berhasil!");
+            tampilkanNotifikasi("Transaksi berhasil!");
         };
 
         request.onerror = function () {
@@ -202,31 +288,34 @@
         };
     }
 
-    // Fungsi untuk update daftar transaksi
-    function updateTransaksiList() {
+    // Fungsi untuk menampilkan riwayat transaksi
+    function showRiwayatTransaksi() {
+        document.getElementById("riwayat-transaksi").style.display = "block";
+        
         const transaction = db.transaction(["transaksi"], "readonly");
         const store = transaction.objectStore("transaksi");
         const request = store.getAll();
 
-        request.onsuccess = function (event) {
-            const transaksiList = event.target.result;
-            const listContainer = document.getElementById("transaksi-list");
-            listContainer.innerHTML = "";
-
+        request.onsuccess = function (e) {
+            const transaksiList = e.target.result;
+            const transaksiUl = document.getElementById("transaksi-list");
+            transaksiUl.innerHTML = "";
             transaksiList.forEach(function (transaksi) {
                 const li = document.createElement("li");
-                li.innerHTML = `
-                    Produk: ${transaksi.produk}<br>
-                    Jumlah: ${transaksi.jumlah}<br>
-                    Diskon: ${transaksi.diskon}%<br>
-                    Ongkir: ${transaksi.ongkir}<br>
-                    Total: ${transaksi.total}<br>
-                    Status: ${transaksi.status}<br>
-                    Tanggal: ${new Date(transaksi.tanggal).toLocaleString()}
-                `;
-                listContainer.appendChild(li);
+                li.textContent = `Produk: ${transaksi.produk}, Jumlah: ${transaksi.jumlah}, Diskon: ${transaksi.diskon}%, Ongkir: ${transaksi.ongkir}, Tanggal: ${new Date(transaksi.tanggal).toLocaleString()}`;
+                transaksiUl.appendChild(li);
             });
         };
+    }
+
+    // Fungsi menampilkan notifikasi
+    function tampilkanNotifikasi(message) {
+        const notifikasi = document.getElementById("notifikasi");
+        notifikasi.innerHTML = message;
+        notifikasi.style.display = "block";
+        setTimeout(function () {
+            notifikasi.style.display = "none";
+        }, 3000);
     }
 </script>
 
