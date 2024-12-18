@@ -88,3 +88,6 @@ function addCategory() {
 // Event listeners for login and register
 document.getElementById("login-form").addEventListener("submit", handleLogin);
 document.getElementById("register-form").addEventListener("submit", handleRegister);
+let products = JSON.parse(localStorage.getItem("products")) || [];
+let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
