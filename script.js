@@ -175,7 +175,99 @@ const shippingCost = parseFloat(document.getElementById("shipping").value) || 0;
 const totalPrice = (product.price * quantity) + shippingCost;
 
 
+// Data pengguna di localStorage, dengan role admin atau user
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
+function handleRegister(event) {
+    event.preventDefault();
+    const email = document.getElementById("new-email").value;
+    const password = document.getElementById("new-password").value;
+    
+    // Jika ini adalah admin pertama yang mendaftar
+    const isAdmin = users.length === 0;  // admin pertama yang mendaftar
+    const role = isAdmin ? 'admin' : 'user';
+
+    const newUser = { email, password, role };
+    users.push(newUser);
+    localStorage.setItem("users", JSON.stringify(users));
+    alert("Pendaftaran berhasil! Silakan login.");
+    showLoginForm();
+}
+
+function handleLogin(event) {
+    event.preventDefault();
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const user = users.find(user => user.email === email && user.password === password);
+
+    if (user) {
+        currentUser = user;
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        alert("Login berhasil!");
+        showDashboard(user.role); // Menampilkan dashboard sesuai role
+    } else {
+        alert("Email atau Password salah!");
+    }
+}
+
+function showDashboard(role) {
+    if (role === 'admin') {
+        // Admin dapat mengakses semua fitur
+        document.getElementById("admin-dashboard").style.display = "block";
+        document.getElementById("user-dashboard").style.display = "none";
+    } else {
+        // User biasa hanya bisa mengakses transaksi
+        document.getElementById("admin-dashboard").style.display = "none";
+        document.getElementById("user-dashboard").style.display = "block";
+    }
+}
+
+
+function showNotification(message, type = 'success') {
+    const notification = document.getElementById("notification");
+    const messageElement = document.getElementById("notification-message");
+    
+    messageElement.textContent = message;
+    notification.style.backgroundColor = type === 'success' ? '#4caf50' : '#f44336';  // Hijau untuk sukses, merah untuk error
+    notification.style.display = 'block';
+
+    // Sembunyikan setelah 3 detik
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
+
+
+showNotification("Transaksi berhasil diselesaikan!");
+
+
+function generateQRCode(transaction) {
+    const qrCodeContainer = document.getElementById("qrcode-container");
+    
+    const transactionData = {
+        id: transaction.id,
+        product: transaction.product.name,
+        quantity: transaction.quantity,
+        totalPrice: transaction.totalPrice
+    };
+
+    const qrData = JSON.stringify(transactionData);
+
+    // Generate QR Code
+    QRCode.toCanvas(qrCodeContainer, qrData, function (error) {
+        if (error) {
+            console.error(error);
+        } else {
+            console.log("QR Code berhasil dibuat!");
+        }
+    });
+}
+
+
+
+// Contoh setelah transaksi selesai
+generateQRCode(transaction);
 
 
 
