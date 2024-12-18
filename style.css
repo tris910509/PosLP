@@ -1,61 +1,33 @@
 body {
     font-family: Arial, sans-serif;
-}
-
-header {
-    background-color: #333;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f9;
 }
 
 h1 {
-    margin: 0;
+    text-align: center;
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-    margin: 20px;
+#app {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-input, button {
-    margin: 10px 0;
-    padding: 10px;
+input, select, button {
+    padding: 8px;
+    margin: 5px;
+    font-size: 14px;
 }
 
-button {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    cursor: pointer;
+ul {
+    list-style-type: none;
+    padding-left: 0;
 }
 
-button:hover {
-    background-color: #218838;
-}
-
-#transactions-section {
-    margin-top: 20px;
-}
-
-#add-transaction-section {
-    margin-top: 20px;
-}
-
-button {
-    margin-top: 10px;
-}
-
-
-#notification {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background-color: #4caf50;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+li {
+    margin: 5px 0;
 }
