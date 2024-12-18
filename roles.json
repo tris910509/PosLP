@@ -1,14 +1,5 @@
-{
-  "users": [
-    {
-      "username": "admin1",
-      "password": "admin123",
-      "role": "admin"
-    },
-    {
-      "username": "user1",
-      "password": "user123",
-      "role": "user"
-    }
-  ]
-}
+[
+  { "id": 1, "name": "Produk A", "price": 10000 },
+  { "id": 2, "name": "Produk B", "price": 15000 },
+  { "id": 3, "name": "Produk C", "price": 20000 }
+]
