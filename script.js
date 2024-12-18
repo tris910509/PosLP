@@ -171,6 +171,8 @@ function cancelTransaction() {
 document.getElementById("transaction-form").addEventListener("submit", handleTransaction);
 
 
+const shippingCost = parseFloat(document.getElementById("shipping").value) || 0;
+const totalPrice = (product.price * quantity) + shippingCost;
 
 
 
