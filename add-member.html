@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Member</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>Tambah Member</h2>
+    <form id="addMemberForm">
+        <div class="mb-3">
+            <label for="memberName" class="form-label">Nama Member</label>
+            <input type="text" class="form-control" id="memberName" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Simpan Member</button>
+    </form>
+    <button id="logoutButton" class="btn btn-danger">Logout</button>
+</div>
+
+<script src="script.js"></script>
+<script>
+    document.getElementById("addMemberForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = document.getElementById("memberName").value;
+
+        if (name) {
+            members.push({ name });
+            saveData();
+            window.location.href = 'members.html';
+        }
+    });
+
+    document.getElementById("logoutButton").addEventListener("click", () => {
+        sessionStorage.removeItem('loggedInUser');
+        window.location.href = 'login.html';
+    });
+</script>
