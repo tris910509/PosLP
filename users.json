@@ -1,0 +1,13 @@
+// users.json
+[
+    {
+        "username": "admin",
+        "password": "admin123",
+        "role": "admin"
+    },
+    {
+        "username": "cashier",
+        "password": "cashier123",
+        "role": "cashier"
+    }
+]
