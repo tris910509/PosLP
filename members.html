@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Member</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>Kelola Member</h2>
+    <a href="add-member.html" class="btn btn-primary mb-3">Tambah Member</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nama Member</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="memberList"></tbody>
+    </table>
+    <button id="logoutButton" class="btn btn-danger">Logout</button>
+</div>
+
+<script src="script.js"></script>
+<script>
+    // Load member data and render to table
+    function renderMembers() {
+        const tbody = document.getElementById('memberList');
+        tbody.innerHTML = '';
+        members.forEach((member, index) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${member.name}</td>
+                    <td>
+                        <a href="edit-member.html?id=${index}" class="btn btn-warning btn-sm">Edit</a>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMember(${index})">Hapus</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function deleteMember(index) {
+        members.splice(index, 1);
+        saveData();
+        renderMembers();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderMembers();
+
+        document.getElementById("logoutButton").addEventListener("click", () => {
+            sessionStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html';
+        });
+    });
+</script>
