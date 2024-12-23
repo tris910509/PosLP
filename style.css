@@ -4,28 +4,44 @@ body {
 }
 
 h1, h2 {
-  color: #333;
+  color: #444;
 }
 
 form {
   margin-bottom: 20px;
 }
 
-input, select {
+input, select, button {
   margin: 5px;
-  padding: 5px;
-}
-
-button {
-  padding: 5px 10px;
+  padding: 8px;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 10px;
 }
 
 th, td {
   padding: 10px;
+  border: 1px solid #ddd;
   text-align: left;
+}
+
+button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+pre {
+  background: #f8f9fa;
+  padding: 10px;
+  border: 1px solid #ddd;
+  overflow-x: auto;
 }
