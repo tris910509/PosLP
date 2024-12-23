@@ -22,7 +22,7 @@ function showSection(sectionId) {
 }
 
 function renderProducts() {
-    const tbody = document.querySelector('#products tbody');
+    const tbody = document.querySelector('#productList');
     tbody.innerHTML = '';
     products.forEach((product, index) => {
         const totalPrice = product.price * (1 - product.discount / 100);
@@ -37,8 +37,8 @@ function renderProducts() {
                 <td>${product.discount.toFixed(2)}%</td>
                 <td>${totalPrice.toFixed(2)}</td>
                 <td>
-                    <button class="btn btn-sm btn-warning" onclick="editProduct(${index})">Edit</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteProduct(${index})">Hapus</button>
+                    <button class="btn btn-warning btn-sm" onclick="editProduct(${index})">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(${index})">Hapus</button>
                 </td>
             </tr>
         `;
@@ -47,28 +47,22 @@ function renderProducts() {
 
 function renderCategories() {
     const select = document.getElementById('productCategory');
-    const categoryList = document.getElementById('categoryList');
     select.innerHTML = '';
-    categoryList.innerHTML = '';
     categories.forEach(category => {
         select.innerHTML += `<option value="${category}">${category}</option>`;
-        categoryList.innerHTML += `<li class="list-group-item">${category}</li>`;
     });
 }
 
 function renderSuppliers() {
     const select = document.getElementById('productSupplier');
-    const supplierList = document.getElementById('supplierList');
     select.innerHTML = '';
-    supplierList.innerHTML = '';
     suppliers.forEach(supplier => {
         select.innerHTML += `<option value="${supplier}">${supplier}</option>`;
-        supplierList.innerHTML += `<li class="list-group-item">${supplier}</li>`;
     });
 }
 
 function renderMembers() {
-    const tbody = document.querySelector('#members tbody');
+    const tbody = document.querySelector('#memberList');
     tbody.innerHTML = '';
     members.forEach((member, index) => {
         tbody.innerHTML += `
@@ -83,7 +77,7 @@ function renderMembers() {
 }
 
 function renderTransactions() {
-    const tbody = document.querySelector('#transactions tbody');
+    const tbody = document.querySelector('#transactionList');
     tbody.innerHTML = '';
     transactions.forEach((transaction, index) => {
         const product = products.find(p => p.name === transaction.product);
@@ -222,7 +216,7 @@ document.getElementById("addTransactionForm").onsubmit = addTransactionFormSubmi
 
 // Export CSV
 document.getElementById("exportProducts").addEventListener("click", () => {
-    exportToCSV('products.csv', products, ["Nama Produk", "Kategori", "Supplier", "Satuan", "Harga", "Diskon", "Total"]);
+    exportToCSV('products.csv', products, ["Nama Produk", "Kategori", "Supplier", "Satuan", "Harga", "Diskon", "Total Harga"]);
 });
 
 document.getElementById("exportMembers").addEventListener("click", () => {
