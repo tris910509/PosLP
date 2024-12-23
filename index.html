@@ -9,9 +9,6 @@
         body {
             font-family: Arial, sans-serif;
         }
-        .section-header {
-            margin-bottom: 20px;
-        }
         .hidden {
             display: none;
         }
@@ -100,7 +97,110 @@
             </table>
         </section>
 
-        <!-- Similar sections for Categories, Suppliers, Members, Transactions, Export -->
+        <section id="categories" class="hidden">
+            <div class="section-header">
+                <h2>Kategori</h2>
+                <form id="addCategoryForm" class="row g-3">
+                    <div class="col-md-8">
+                        <label for="categoryName" class="form-label">Nama Kategori</label>
+                        <input type="text" class="form-control" id="categoryName" placeholder="Nama Kategori" required>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary mt-4">Tambah Kategori</button>
+                    </div>
+                </form>
+            </div>
+            <h3>Daftar Kategori</h3>
+            <ul id="categoryList" class="list-group"></ul>
+        </section>
+
+        <section id="suppliers" class="hidden">
+            <div class="section-header">
+                <h2>Supplier</h2>
+                <form id="addSupplierForm" class="row g-3">
+                    <div class="col-md-8">
+                        <label for="supplierName" class="form-label">Nama Supplier</label>
+                        <input type="text" class="form-control" id="supplierName" placeholder="Nama Supplier" required>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary mt-4">Tambah Supplier</button>
+                    </div>
+                </form>
+            </div>
+            <h3>Daftar Supplier</h3>
+            <ul id="supplierList" class="list-group"></ul>
+        </section>
+
+        <section id="members" class="hidden">
+            <div class="section-header">
+                <h2>Member</h2>
+                <form id="addMemberForm" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="memberName" class="form-label">Nama Member</label>
+                        <input type="text" class="form-control" id="memberName" placeholder="Nama Member" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="memberPhone" class="form-label">No. Telepon</label>
+                        <input type="text" class="form-control" id="memberPhone" placeholder="No. Telepon" required>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Tambah Member</button>
+                    </div>
+                </form>
+            </div>
+            <h3>Daftar Member</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nama</th>
+                        <th>No. Telepon</th>
+                        <th>Total Transaksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+        <section id="transactions" class="hidden">
+            <div class="section-header">
+                <h2>Transaksi</h2>
+                <form id="addTransactionForm" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="transactionProduct" class="form-label">Produk</label>
+                        <select id="transactionProduct" class="form-select" required></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="transactionMember" class="form-label">Member</label>
+                        <select id="transactionMember" class="form-select" required></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="transactionQuantity" class="form-label">Jumlah</label>
+                        <input type="number" class="form-control" id="transactionQuantity" placeholder="Jumlah" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="transactionDate" class="form-label">Tanggal</label>
+                        <input type="date" class="form-control" id="transactionDate" required>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Tambah Transaksi</button>
+                    </div>
+                </form>
+            </div>
+            <h3>Daftar Transaksi</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Produk</th>
+                        <th>Member</th>
+                        <th>Jumlah</th>
+                        <th>Tanggal</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
 
         <section id="export" class="hidden">
             <div class="section-header">
