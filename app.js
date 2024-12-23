@@ -1,6 +1,6 @@
-// Data barang dan transaksi
-let products = [];
-let transactions = [];
+// Inisialisasi localStorage
+let products = JSON.parse(localStorage.getItem("products")) || [];
+let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
 // Elemen DOM
 const productTable = document.getElementById("productTable");
@@ -10,6 +10,12 @@ const paymentSummary = document.getElementById("paymentSummary");
 const exportButton = document.getElementById("exportButton");
 const reportButton = document.getElementById("reportButton");
 const reportDisplay = document.getElementById("reportDisplay");
+
+// Fungsi untuk menyimpan data ke localStorage
+function saveToLocalStorage() {
+  localStorage.setItem("products", JSON.stringify(products));
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+}
 
 // Fungsi untuk merender tabel barang
 function renderTable() {
@@ -47,6 +53,7 @@ addForm.addEventListener("submit", (event) => {
   const discount = parseFloat(document.getElementById("discount").value);
 
   products.push({ name, category, unit, price, discount });
+  saveToLocalStorage();
   renderTable();
 
   addForm.reset();
@@ -64,6 +71,7 @@ function editProduct(index) {
 
   if (newName && newCategory && newUnit && !isNaN(newPrice) && !isNaN(newDiscount)) {
     products[index] = { name: newName, category: newCategory, unit: newUnit, price: newPrice, discount: newDiscount };
+    saveToLocalStorage();
     renderTable();
   }
 }
@@ -72,6 +80,7 @@ function editProduct(index) {
 function deleteProduct(index) {
   if (confirm("Apakah Anda yakin ingin menghapus barang ini?")) {
     products.splice(index, 1);
+    saveToLocalStorage();
     renderTable();
   }
 }
@@ -90,6 +99,7 @@ paymentForm.addEventListener("submit", (event) => {
 
     paymentSummary.textContent = `Total: Rp ${total.toLocaleString()}, Dibayar: Rp ${amountPaid.toLocaleString()}, Kembalian: Rp ${change.toLocaleString()}`;
     products = []; // Reset produk setelah transaksi
+    saveToLocalStorage();
     renderTable();
   } else {
     paymentSummary.textContent = "Uang tidak cukup.";
