@@ -222,48 +222,49 @@ document.getElementById("addTransactionForm").onsubmit = addTransactionFormSubmi
 
 // Export CSV
 document.getElementById("exportProducts").addEventListener("click", () => {
-    exportToCSV(products, "products.csv");
+    exportToCSV('products.csv', products, ["Nama Produk", "Kategori", "Supplier", "Satuan", "Harga", "Diskon", "Total"]);
 });
 
 document.getElementById("exportMembers").addEventListener("click", () => {
-    exportToCSV(members, "members.csv");
+    exportToCSV('members.csv', members, ["Nama Member", "No. Telepon"]);
 });
 
-function exportToCSV(data, fileName) {
-    const csv = data.map(row => Object.values(row).join(',')).join('\n');
-    const csvFile = new Blob([csv], { type: "text/csv" });
-    const downloadLink = document.createElement("a");
-    downloadLink.download = fileName;
-    downloadLink.href = URL.createObjectURL(csvFile);
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+function exportToCSV(filename, rows, headers) {
+    let csvContent = headers.join(",") + "\n";
+    rows.forEach(row => {
+        csvContent += headers.map(header => row[header]).join(",") + "\n";
+    });
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
 }
 
-// Login
-document.getElementById('loginForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+// Load Initial Data
+document.addEventListener('DOMContentLoaded', () => {
+    renderProducts();
+    renderCategories();
+    renderSuppliers();
+    renderMembers();
+    renderTransactions();
 
-    if (username === 'admin' && password === 'password123') {
-        document.getElementById('admin-login').classList.add('hidden');
-        document.getElementById('mainNav').classList.remove('hidden');
-        showSection('products');
-    } else {
-        document.getElementById('loginError').classList.remove('hidden');
-    }
+    document.getElementById("logoutButton").addEventListener("click", () => {
+        document.getElementById("mainNav").classList.add("hidden");
+        document.getElementById("admin-login").classList.remove("hidden");
+    });
+
+    document.getElementById("loginForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        // Simple login validation (replace with real validation)
+        if (username === 'admin' && password === 'password') {
+            document.getElementById("admin-login").classList.add("hidden");
+            document.getElementById("mainNav").classList.remove("hidden");
+        } else {
+            document.getElementById("loginError").classList.remove("hidden");
+        }
+    });
 });
-
-document.getElementById('logoutButton').addEventListener('click', () => {
-    localStorage.clear();
-    location.reload();
-});
-
-// Initial Render
-renderProducts();
-renderCategories();
-renderSuppliers();
-renderMembers();
-renderTransactions();
