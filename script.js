@@ -1,88 +1,40 @@
-// Produk Data
+// Data Produk, Member, Transaksi, dan User
 let products = JSON.parse(localStorage.getItem('products')) || [];
-let categories = JSON.parse(localStorage.getItem('categories')) || [];
-let suppliers = JSON.parse(localStorage.getItem('suppliers')) || [];
 let members = JSON.parse(localStorage.getItem('members')) || [];
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+let users = JSON.parse(localStorage.getItem('users')) || [];
 
-// Helper Functions
+// Simpan Data ke Local Storage
 function saveData() {
     localStorage.setItem('products', JSON.stringify(products));
-    localStorage.setItem('categories', JSON.stringify(categories));
-    localStorage.setItem('suppliers', JSON.stringify(suppliers));
     localStorage.setItem('members', JSON.stringify(members));
     localStorage.setItem('transactions', JSON.stringify(transactions));
+    localStorage.setItem('users', JSON.stringify(users));
 }
 
-function showSection(sectionId) {
-    document.querySelectorAll('section').forEach(section => {
-        section.classList.add('hidden');
-    });
-    document.getElementById(sectionId).classList.remove('hidden');
-}
-
-function renderProducts() {
-    const tbody = document.querySelector('#productList');
-    tbody.innerHTML = '';
-    products.forEach((product, index) => {
-        const totalPrice = product.price * (1 - product.discount / 100);
-        tbody.innerHTML += `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${product.name}</td>
-                <td>${product.category}</td>
-                <td>${product.supplier}</td>
-                <td>${product.unit}</td>
-                <td>${product.price.toFixed(2)}</td>
-                <td>${product.discount.toFixed(2)}%</td>
-                <td>${totalPrice.toFixed(2)}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" onclick="editProduct(${index})">Edit</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(${index})">Hapus</button>
-                </td>
-            </tr>
-        `;
-    });
-}
-
-function renderCategories() {
-    const select = document.getElementById('productCategory');
+// Render Produk Dropdown
+function renderProductsDropdown() {
+    const select = document.getElementById('transactionProduct');
     select.innerHTML = '';
-    categories.forEach(category => {
-        select.innerHTML += `<option value="${category}">${category}</option>`;
+    products.forEach(product => {
+        select.innerHTML += `<option value="${product.name}" data-price="${product.price}" data-discount="${product.discount}">${product.name}</option>`;
     });
 }
 
-function renderSuppliers() {
-    const select = document.getElementById('productSupplier');
+// Render Member Dropdown
+function renderMembersDropdown() {
+    const select = document.getElementById('transactionMember');
     select.innerHTML = '';
-    suppliers.forEach(supplier => {
-        select.innerHTML += `<option value="${supplier}">${supplier}</option>`;
+    members.forEach(member => {
+        select.innerHTML += `<option value="${member.name}">${member.name}</option>`;
     });
 }
 
-function renderMembers() {
-    const tbody = document.querySelector('#memberList');
-    tbody.innerHTML = '';
-    members.forEach((member, index) => {
-        const totalTransactions = transactions.filter(trx => trx.member === member.name).length;
-        tbody.innerHTML += `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${member.name}</td>
-                <td>${member.phone}</td>
-                <td>${totalTransactions}</td>
-            </tr>
-        `;
-    });
-}
-
+// Render Transaksi
 function renderTransactions() {
     const tbody = document.querySelector('#transactionList');
     tbody.innerHTML = '';
     transactions.forEach((transaction, index) => {
-        const product = products.find(p => p.name === transaction.product);
-        const totalPrice = product.price * transaction.quantity * (1 - product.discount / 100);
         tbody.innerHTML += `
             <tr>
                 <td>${index + 1}</td>
@@ -90,88 +42,61 @@ function renderTransactions() {
                 <td>${transaction.member}</td>
                 <td>${transaction.quantity}</td>
                 <td>${transaction.date}</td>
-                <td>${totalPrice.toFixed(2)}</td>
+                <td>${transaction.totalPrice.toFixed(2)}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="editTransaction(${index})">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteTransaction(${index})">Hapus</button>
+                </td>
             </tr>
         `;
     });
 }
 
-// Add Product
-document.getElementById("addProductForm").addEventListener("submit", (event) => {
-    event.preventDefault();
-    const name = document.getElementById("productName").value;
-    const category = document.getElementById("productCategory").value;
-    const supplier = document.getElementById("productSupplier").value;
-    const unit = document.getElementById("productUnit").value;
-    const price = parseFloat(document.getElementById("productPrice").value);
-    const discount = parseFloat(document.getElementById("productDiscount").value);
-
-    if (name && unit && !isNaN(price) && !isNaN(discount)) {
-        products.push({ name, category, supplier, unit, price, discount });
-        saveData();
-        renderProducts();
-    }
-});
-
-// Edit Product
-function editProduct(index) {
-    const product = products[index];
-    document.getElementById("productName").value = product.name;
-    document.getElementById("productCategory").value = product.category;
-    document.getElementById("productSupplier").value = product.supplier;
-    document.getElementById("productUnit").value = product.unit;
-    document.getElementById("productPrice").value = product.price;
-    document.getElementById("productDiscount").value = product.discount;
-
-    products.splice(index, 1);
-    saveData();
-    renderProducts();
-}
-
-// Delete Product
-function deleteProduct(index) {
-    products.splice(index, 1);
-    saveData();
-    renderProducts();
-}
-
-// Add Member
-document.getElementById("addMemberForm").addEventListener("submit", (event) => {
-    event.preventDefault();
-    const name = document.getElementById("memberName").value;
-    const phone = document.getElementById("memberPhone").value;
-
-    if (name && phone) {
-        members.push({ name, phone });
-        saveData();
-        renderMembers();
-    }
-});
-
 // Add Transaction
 document.getElementById("addTransactionForm").addEventListener("submit", (event) => {
     event.preventDefault();
-    const product = document.getElementById("transactionProduct").value;
+    const productSelect = document.getElementById("transactionProduct");
+    const productName = productSelect.value;
+    const productDetails = products.find(p => p.name === productName);
     const member = document.getElementById("transactionMember").value;
     const quantity = parseInt(document.getElementById("transactionQuantity").value);
     const date = document.getElementById("transactionDate").value;
 
-    if (product && member && !isNaN(quantity) && date) {
-        transactions.push({ product, member, quantity, date });
+    if (productName && member && !isNaN(quantity) && date) {
+        const totalPrice = productDetails.price * quantity * (1 - productDetails.discount / 100);
+        
+        transactions.push({ product: productName, member, quantity, date, totalPrice });
         saveData();
         renderTransactions();
     }
 });
 
-// Export to CSV
-document.getElementById("exportProducts").addEventListener("click", () => {
-    exportToCSV('products.csv', products, ["Nama Produk", "Kategori", "Supplier", "Satuan", "Harga", "Diskon", "Total Harga"]);
+// Edit Transaction
+function editTransaction(index) {
+    const transaction = transactions[index];
+    document.getElementById("transactionProduct").value = transaction.product;
+    document.getElementById("transactionMember").value = transaction.member;
+    document.getElementById("transactionQuantity").value = transaction.quantity;
+    document.getElementById("transactionDate").value = transaction.date;
+
+    transactions.splice(index, 1);
+    saveData();
+    renderTransactions();
+}
+
+// Delete Transaction
+function deleteTransaction(index) {
+    transactions.splice(index, 1);
+    saveData();
+    renderTransactions();
+}
+
+// Export Transaksi to CSV
+document.getElementById("exportTransactions").addEventListener("click", () => {
+    exportToCSV('transactions.csv', transactions, ["Produk", "Member", "Jumlah", "Tanggal", "Total Harga"]);
 });
 
-document.getElementById("exportMembers").addEventListener("click", () => {
-    exportToCSV('members.csv', members, ["Nama Member", "No. Telepon"]);
-});
-
+// Export Helper Function
 function exportToCSV(filename, rows, headers) {
     let csvContent = headers.join(",") + "\n";
     rows.forEach(row => {
@@ -184,29 +109,42 @@ function exportToCSV(filename, rows, headers) {
     link.click();
 }
 
-// Load Initial Data
+// Login and Access Control
+function login() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    const user = users.find(u => u.username === username && u.password === password);
+    if (user) {
+        sessionStorage.setItem('loggedInUser', JSON.stringify(user));
+        redirectToAppropriatePage(user.role);
+    } else {
+        alert("Username atau password salah!");
+    }
+}
+
+function redirectToAppropriatePage(role) {
+    switch(role) {
+        case 'admin':
+            window.location.href = 'admin-dashboard.html';
+            break;
+        case 'cashier':
+            window.location.href = 'cashier-dashboard.html';
+            break;
+        default:
+            window.location.href = 'index.html';
+            break;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    renderProducts();
-    renderCategories();
-    renderSuppliers();
-    renderMembers();
-    renderTransactions();
+    const user = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (user) {
+        redirectToAppropriatePage(user.role);
+    }
 
     document.getElementById("logoutButton").addEventListener("click", () => {
-        document.getElementById("mainNav").classList.add("hidden");
-        document.getElementById("admin-login").classList.remove("hidden");
-    });
-
-    document.getElementById("loginForm").addEventListener("submit", (event) => {
-        event.preventDefault();
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
-
-        if (username === 'admin' && password === 'password') {
-            document.getElementById("admin-login").classList.add("hidden");
-            document.getElementById("mainNav").classList.remove("hidden");
-        } else {
-            document.getElementById("loginError").classList.remove("hidden");
-        }
+        sessionStorage.removeItem('loggedInUser');
+        window.location.href = 'login.html';
     });
 });
