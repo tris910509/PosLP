@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Produk</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>Kelola Produk</h2>
+    <a href="add-product.html" class="btn btn-primary mb-3">Tambah Produk</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nama Produk</th>
+                <th>Harga</th>
+                <th>Diskon (%)</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="productList"></tbody>
+    </table>
+    <button id="logoutButton" class="btn btn-danger">Logout</button>
+</div>
+
+<script src="script.js"></script>
+<script>
+    // Load product data and render to table
+    function renderProducts() {
+        const tbody = document.getElementById('productList');
+        tbody.innerHTML = '';
+        products.forEach((product, index) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${product.name}</td>
+                    <td>${product.price}</td>
+                    <td>${product.discount}</td>
+                    <td>
+                        <a href="edit-product.html?id=${index}" class="btn btn-warning btn-sm">Edit</a>
+                        <button class="btn btn-danger btn-sm" onclick="deleteProduct(${index})">Hapus</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function deleteProduct(index) {
+        products.splice(index, 1);
+        saveData();
+        renderProducts();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderProducts();
+
+        document.getElementById("logoutButton").addEventListener("click", () => {
+            sessionStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html';
+        });
+    });
+</script>
