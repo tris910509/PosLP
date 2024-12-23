@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Produk</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>Tambah Produk</h2>
+    <form id="addProductForm">
+        <div class="mb-3">
+            <label for="productName" class="form-label">Nama Produk</label>
+            <input type="text" class="form-control" id="productName" required>
+        </div>
+        <div class="mb-3">
+            <label for="productPrice" class="form-label">Harga</label>
+            <input type="number" class="form-control" id="productPrice" required>
+        </div>
+        <div class="mb-3">
+            <label for="productDiscount" class="form-label">Diskon (%)</label>
+            <input type="number" class="form-control" id="productDiscount" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Simpan Produk</button>
+    </form>
+    <button id="logoutButton" class="btn btn-danger">Logout</button>
+</div>
+
+<script src="script.js"></script>
+<script>
+    document.getElementById("addProductForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = document.getElementById("productName").value;
+        const price = parseFloat(document.getElementById("productPrice").value);
+        const discount = parseFloat(document.getElementById("productDiscount").value);
+
+        if (name && !isNaN(price) && !isNaN(discount)) {
+            products.push({ name, price, discount });
+            saveData();
+            window.location.href = 'products.html';
+        }
+    });
+
+    document.getElementById("logoutButton").addEventListener("click", () => {
+        sessionStorage.removeItem('loggedInUser');
+        window.location.href = 'login.html';
+    });
+</script>
