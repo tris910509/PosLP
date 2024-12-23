@@ -1,374 +1,68 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Kasir</title>
-    <style>
-        /* Styling elements */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #login-form, #register-form, #transaksi-form, #suplier-form, #produk-form, #riwayat-transaksi {
-            margin-top: 20px;
-        }
-        #notifikasi {
-            display: none;
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            border-radius: 5px;
-        }
-        ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        li {
-            margin: 5px 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplikasi Kasir</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <h1>Aplikasi Kasir</h1>
 
-<!-- Login Form -->
-<div id="login-form">
-    <h2>Login</h2>
-    <input type="text" id="login-username" placeholder="Username" required>
-    <input type="password" id="login-password" placeholder="Password" required>
-    <button onclick="login()">Login</button>
-    <p>Belum punya akun? <a href="javascript:void(0);" onclick="showRegisterForm()">Daftar</a></p>
-</div>
+  <!-- Form Tambah Barang -->
+  <div>
+    <h2>Tambah Barang</h2>
+    <form id="addForm">
+      <label for="name">Nama Barang:</label>
+      <input type="text" id="name" required>
+      <label for="category">Kategori:</label>
+      <input type="text" id="category" required>
+      <label for="unit">Satuan:</label>
+      <input type="text" id="unit" required>
+      <label for="price">Harga:</label>
+      <input type="number" id="price" required>
+      <label for="discount">Diskon (%):</label>
+      <input type="number" id="discount" required>
+      <button type="submit">Tambah</button>
+    </form>
+  </div>
 
-<!-- Register Form -->
-<div id="register-form" style="display:none;">
-    <h2>Daftar Pengguna Baru</h2>
-    <input type="text" id="register-username" placeholder="Username" required>
-    <input type="password" id="register-password" placeholder="Password" required>
-    <input type="password" id="register-password-confirm" placeholder="Konfirmasi Password" required>
-    <button onclick="register()">Daftar</button>
-    <p>Sudah punya akun? <a href="javascript:void(0);" onclick="showLoginForm()">Login</a></p>
-</div>
+  <!-- Tabel Barang -->
+  <h2>Daftar Barang</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Nama Barang</th>
+        <th>Kategori</th>
+        <th>Satuan</th>
+        <th>Harga</th>
+        <th>Diskon</th>
+        <th>Harga Akhir</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="productTable"></tbody>
+  </table>
 
-<!-- Notifikasi -->
-<div id="notifikasi">Transaksi berhasil!</div>
+  <!-- Pembayaran -->
+  <h2>Pembayaran</h2>
+  <form id="paymentForm">
+    <label for="paymentMethod">Metode Pembayaran:</label>
+    <select id="paymentMethod">
+      <option value="Cash">Cash</option>
+      <option value="Credit Card">Credit Card</option>
+      <option value="E-Wallet">E-Wallet</option>
+    </select>
+    <label for="amountPaid">Jumlah Dibayar:</label>
+    <input type="number" id="amountPaid" required>
+    <button type="submit">Bayar</button>
+  </form>
+  <p id="paymentSummary"></p>
 
-<!-- Menu Admin dan Kasir -->
-<ul id="menu">
-    <li id="admin-menu" style="display:none;">
-        <a href="javascript:void(0);" onclick="showSuplierForm()">Manajemen Suplier</a><br>
-        <a href="javascript:void(0);" onclick="showProdukForm()">Manajemen Produk</a><br>
-        <a href="javascript:void(0);" onclick="showRiwayatTransaksi()">Riwayat Transaksi</a>
-    </li>
-    <li id="kasir-menu" style="display:none;">
-        <a href="javascript:void(0);" onclick="showTransaksiForm()">Transaksi Kasir</a><br>
-        <a href="javascript:void(0);" onclick="showRiwayatTransaksi()">Riwayat Transaksi</a>
-    </li>
-    <li id="pelanggan-menu" style="display:none;">
-        <a href="javascript:void(0);" onclick="showRiwayatTransaksi()">Riwayat Transaksi</a>
-    </li>
-</ul>
+  <!-- Ekspor Data -->
+  <button id="exportButton">Ekspor Data</button>
 
-<!-- Suplier Management Form -->
-<div id="suplier-form" style="display:none;">
-    <h3>Tambah Suplier</h3>
-    <label for="suplier-nama">Nama Suplier</label>
-    <input type="text" id="suplier-nama" required>
-    <label for="suplier-alamat">Alamat</label>
-    <input type="text" id="suplier-alamat" required>
-    <label for="suplier-telepon">Telepon</label>
-    <input type="text" id="suplier-telepon" required>
-    <button onclick="tambahSuplier()">Tambah Suplier</button>
-</div>
-
-<!-- Produk Management Form -->
-<div id="produk-form" style="display:none;">
-    <h3>Tambah Produk</h3>
-    <label for="produk-nama">Nama Produk</label>
-    <input type="text" id="produk-nama" required>
-    <label for="produk-harga">Harga Produk</label>
-    <input type="number" id="produk-harga" required>
-    <label for="produk-stok">Stok</label>
-    <input type="number" id="produk-stok" required>
-    <button onclick="tambahProduk()">Tambah Produk</button>
-</div>
-
-<!-- Transaksi Form -->
-<div id="transaksi-form" style="display:none;">
-    <h3>Form Transaksi</h3>
-    <label for="produk">Produk</label>
-    <input type="text" id="produk" required>
-    <label for="jumlah">Jumlah</label>
-    <input type="number" id="jumlah" required>
-    <label for="diskon">Diskon (%)</label>
-    <input type="number" id="diskon">
-    <label for="ongkir">Ongkir</label>
-    <input type="number" id="ongkir">
-    <button onclick="prosesTransaksi()">Proses Transaksi</button>
-</div>
-
-<!-- Riwayat Transaksi -->
-<div id="riwayat-transaksi" style="display:none;">
-    <h3>Riwayat Transaksi</h3>
-    <ul id="transaksi-list"></ul>
-</div>
-
-<script>
-    // IndexedDB Setup
-    const dbName = "kasirDB";
-    let db;
-
-    const request = indexedDB.open(dbName, 1);
-
-    request.onupgradeneeded = function (e) {
-        db = e.target.result;
-        if (!db.objectStoreNames.contains("users")) {
-            const usersStore = db.createObjectStore("users", { keyPath: "username" });
-            usersStore.createIndex("username", "username", { unique: true });
-        }
-        if (!db.objectStoreNames.contains("suplier")) {
-            const suplierStore = db.createObjectStore("suplier", { keyPath: "id", autoIncrement: true });
-        }
-        if (!db.objectStoreNames.contains("produk")) {
-            const produkStore = db.createObjectStore("produk", { keyPath: "id", autoIncrement: true });
-        }
-        if (!db.objectStoreNames.contains("transaksi")) {
-            const transaksiStore = db.createObjectStore("transaksi", { keyPath: "id", autoIncrement: true });
-        }
-    };
-
-    request.onsuccess = function (e) {
-        db = e.target.result;
-    };
-
-    request.onerror = function (e) {
-        console.error("Error opening IndexedDB", e);
-    };
-
-    // Fungsi Menampilkan Form Pendaftaran
-    function showRegisterForm() {
-        document.getElementById("login-form").style.display = "none";
-        document.getElementById("register-form").style.display = "block";
-    }
-
-    // Fungsi Menampilkan Form Login
-    function showLoginForm() {
-        document.getElementById("register-form").style.display = "none";
-        document.getElementById("login-form").style.display = "block";
-    }
-
-    // Fungsi untuk mendaftar pengguna
-    function register() {
-        const username = document.getElementById("register-username").value;
-        const password = document.getElementById("register-password").value;
-        const confirmPassword = document.getElementById("register-password-confirm").value;
-
-        if (password !== confirmPassword) {
-            alert("Password dan konfirmasi password tidak cocok!");
-            return;
-        }
-
-        const transaction = db.transaction(["users"], "readwrite");
-        const store = transaction.objectStore("users");
-        const user = {
-            username: username,
-            password: password,
-            role: "Pelanggan" // Default role is Pelanggan
-        };
-
-        const request = store.add(user);
-
-        request.onsuccess = function () {
-            alert("Pendaftaran berhasil!");
-            showLoginForm();
-        };
-
-        request.onerror = function () {
-            alert("Gagal mendaftar, username sudah digunakan!");
-        };
-    }
-
-    // Fungsi login
-    function login() {
-        const username = document.getElementById("login-username").value;
-        const password = document.getElementById("login-password").value;
-
-        // Hardcoded Admin credentials
-        const adminUsername = "admin";
-        const adminPassword = "admin123"; // Admin password yang telah ditentukan
-
-        if (username === adminUsername && password === adminPassword) {
-            localStorage.setItem("role", "Admin");
-            showDashboard("Admin");
-            return;
-        }
-
-        const transaction = db.transaction(["users"], "readonly");
-        const store = transaction.objectStore("users");
-        const request = store.get(username);
-
-        request.onsuccess = function (event) {
-            const user = event.target.result;
-            if (user && user.password === password) {
-                localStorage.setItem("role", user.role);
-                showDashboard(user.role);
-            } else {
-                alert("Username atau password salah");
-            }
-        };
-
-        request.onerror = function () {
-            alert("Gagal login!");
-        };
-    }
-
-    // Fungsi menampilkan dashboard berdasarkan role
-    function showDashboard(role) {
-        document.getElementById("login-form").style.display = "none";
-        document.getElementById("register-form").style.display = "none";
-        const menu = document.getElementById("menu");
-
-        if (role === "Admin") {
-            document.getElementById("admin-menu").style.display = "block";
-            document.getElementById("kasir-menu").style.display = "none";
-            document.getElementById("pelanggan-menu").style.display = "none";
-        } else if (role === "Kasir") {
-            document.getElementById("admin-menu").style.display = "none";
-            document.getElementById("kasir-menu").style.display = "block";
-            document.getElementById("pelanggan-menu").style.display = "none";
-        } else {
-            document.getElementById("admin-menu").style.display = "none";
-            document.getElementById("kasir-menu").style.display = "none";
-            document.getElementById("pelanggan-menu").style.display = "block";
-        }
-    }
-
-    // Fungsi tambah suplier
-    function tambahSuplier() {
-        const nama = document.getElementById("suplier-nama").value;
-        const alamat = document.getElementById("suplier-alamat").value;
-        const telepon = document.getElementById("suplier-telepon").value;
-
-        const transaction = db.transaction(["suplier"], "readwrite");
-        const store = transaction.objectStore("suplier");
-        const suplier = { nama: nama, alamat: alamat, telepon: telepon };
-
-        const request = store.add(suplier);
-
-        request.onsuccess = function () {
-            alert("Suplier berhasil ditambahkan!");
-            tampilkanSuplierList();
-        };
-
-        request.onerror = function () {
-            alert("Gagal menambah suplier!");
-        };
-    }
-
-    // Fungsi menampilkan daftar suplier
-    function tampilkanSuplierList() {
-        const transaction = db.transaction(["suplier"], "readonly");
-        const store = transaction.objectStore("suplier");
-        const request = store.getAll();
-
-        request.onsuccess = function (e) {
-            const supliers = e.target.result;
-            const ul = document.createElement("ul");
-            supliers.forEach(function (suplier) {
-                const li = document.createElement("li");
-                li.textContent = `Nama: ${suplier.nama}, Alamat: ${suplier.alamat}, Telepon: ${suplier.telepon}`;
-                ul.appendChild(li);
-            });
-
-            document.getElementById("suplier-form").style.display = "none";
-            document.getElementById("suplier-list").appendChild(ul);
-            document.getElementById("suplier-list").style.display = "block";
-        };
-    }
-
-    // Fungsi tambah produk
-    function tambahProduk() {
-        const namaProduk = document.getElementById("produk-nama").value;
-        const harga = document.getElementById("produk-harga").value;
-        const stok = document.getElementById("produk-stok").value;
-
-        const transaction = db.transaction(["produk"], "readwrite");
-        const store = transaction.objectStore("produk");
-        const produk = { nama: namaProduk, harga: harga, stok: stok };
-
-        const request = store.add(produk);
-
-        request.onsuccess = function () {
-            alert("Produk berhasil ditambahkan!");
-        };
-
-        request.onerror = function () {
-            alert("Gagal menambah produk!");
-        };
-    }
-
-    // Fungsi untuk memproses transaksi
-    function prosesTransaksi() {
-        const produk = document.getElementById("produk").value;
-        const jumlah = document.getElementById("jumlah").value;
-        const diskon = document.getElementById("diskon").value || 0;
-        const ongkir = document.getElementById("ongkir").value || 0;
-
-        const transaction = db.transaction(["transaksi"], "readwrite");
-        const store = transaction.objectStore("transaksi");
-        const transaksi = {
-            produk: produk,
-            jumlah: jumlah,
-            diskon: diskon,
-            ongkir: ongkir,
-            tanggal: new Date()
-        };
-
-        const request = store.add(transaksi);
-
-        request.onsuccess = function () {
-            alert("Transaksi berhasil!");
-            tampilkanNotifikasi("Transaksi berhasil!");
-        };
-
-        request.onerror = function () {
-            alert("Gagal memproses transaksi!");
-        };
-    }
-
-    // Fungsi untuk menampilkan riwayat transaksi
-    function showRiwayatTransaksi() {
-        document.getElementById("riwayat-transaksi").style.display = "block";
-        
-        const transaction = db.transaction(["transaksi"], "readonly");
-        const store = transaction.objectStore("transaksi");
-        const request = store.getAll();
-
-        request.onsuccess = function (e) {
-            const transaksiList = e.target.result;
-            const transaksiUl = document.getElementById("transaksi-list");
-            transaksiUl.innerHTML = "";
-            transaksiList.forEach(function (transaksi) {
-                const li = document.createElement("li");
-                li.textContent = `Produk: ${transaksi.produk}, Jumlah: ${transaksi.jumlah}, Diskon: ${transaksi.diskon}%, Ongkir: ${transaksi.ongkir}, Tanggal: ${new Date(transaksi.tanggal).toLocaleString()}`;
-                transaksiUl.appendChild(li);
-            });
-        };
-    }
-
-    // Fungsi menampilkan notifikasi
-    function tampilkanNotifikasi(message) {
-        const notifikasi = document.getElementById("notifikasi");
-        notifikasi.textContent = message;
-        notifikasi.style.display = "block";
-        setTimeout(function () {
-            notifikasi.style.display = "none";
-        }, 3000);
-    }
-</script>
-
+  <script src="app.js"></script>
 </body>
 </html>
