@@ -3,65 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aplikasi Kasir</title>
+  <title>Aplikasi Kasir Modern</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1>Aplikasi Kasir</h1>
 
   <!-- Form Tambah Barang -->
-  <div>
+  <section id="add-product">
     <h2>Tambah Barang</h2>
     <form id="addForm">
       <label for="name">Nama Barang:</label>
       <input type="text" id="name" required>
       <label for="category">Kategori:</label>
-      <input type="text" id="category" required>
+      <select id="category">
+        <option value="Makanan">Makanan</option>
+        <option value="Minuman">Minuman</option>
+        <option value="Alat Tulis">Alat Tulis</option>
+        <option value="Lainnya">Lainnya</option>
+      </select>
       <label for="unit">Satuan:</label>
-      <input type="text" id="unit" required>
+      <input type="text" id="unit" placeholder="Contoh: Kg, Pcs, Liter" required>
       <label for="price">Harga:</label>
       <input type="number" id="price" required>
       <label for="discount">Diskon (%):</label>
-      <input type="number" id="discount" required>
-      <button type="submit">Tambah</button>
+      <input type="number" id="discount" value="0" required>
+      <button type="submit">Tambah Barang</button>
     </form>
-  </div>
+  </section>
 
-  <!-- Tabel Barang -->
-  <h2>Daftar Barang</h2>
-  <table border="1">
-    <thead>
-      <tr>
-        <th>No</th>
-        <th>Nama Barang</th>
-        <th>Kategori</th>
-        <th>Satuan</th>
-        <th>Harga</th>
-        <th>Diskon</th>
-        <th>Harga Akhir</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody id="productTable"></tbody>
-  </table>
+  <!-- Tabel Daftar Barang -->
+  <section id="product-list">
+    <h2>Daftar Barang</h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Nama Barang</th>
+          <th>Kategori</th>
+          <th>Satuan</th>
+          <th>Harga</th>
+          <th>Diskon</th>
+          <th>Harga Akhir</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="productTable"></tbody>
+    </table>
+  </section>
 
-  <!-- Pembayaran -->
-  <h2>Pembayaran</h2>
-  <form id="paymentForm">
-    <label for="paymentMethod">Metode Pembayaran:</label>
-    <select id="paymentMethod">
-      <option value="Cash">Cash</option>
-      <option value="Credit Card">Credit Card</option>
-      <option value="E-Wallet">E-Wallet</option>
-    </select>
-    <label for="amountPaid">Jumlah Dibayar:</label>
-    <input type="number" id="amountPaid" required>
-    <button type="submit">Bayar</button>
-  </form>
-  <p id="paymentSummary"></p>
+  <!-- Form Pembayaran -->
+  <section id="payment">
+    <h2>Pembayaran</h2>
+    <form id="paymentForm">
+      <label for="paymentMethod">Metode Pembayaran:</label>
+      <select id="paymentMethod">
+        <option value="Cash">Cash</option>
+        <option value="Credit Card">Credit Card</option>
+        <option value="E-Wallet">E-Wallet</option>
+      </select>
+      <label for="amountPaid">Jumlah Dibayar:</label>
+      <input type="number" id="amountPaid" required>
+      <button type="submit">Proses Pembayaran</button>
+    </form>
+    <p id="paymentSummary"></p>
+  </section>
 
-  <!-- Ekspor Data -->
-  <button id="exportButton">Ekspor Data</button>
+  <!-- Ekspor dan Laporan -->
+  <section id="export-report">
+    <h2>Ekspor dan Laporan</h2>
+    <button id="exportButton">Ekspor Data Barang</button>
+    <button id="reportButton">Lihat Laporan</button>
+    <pre id="reportDisplay"></pre>
+  </section>
 
   <script src="app.js"></script>
 </body>
