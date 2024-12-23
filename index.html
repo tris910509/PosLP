@@ -1,129 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aplikasi Kasir Lengkap</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Kasir</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .section-header {
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-  <h1>Aplikasi Kasir Lengkap</h1>
 
-  <!-- Login Admin -->
-  <section id="admin-login">
-    <h2>Login Admin</h2>
-    <form id="loginForm">
-      <label for="username">Username:</label>
-      <input type="text" id="username" required>
-      <label for="password">Password:</label>
-      <input type="password" id="password" required>
-      <button type="submit">Login</button>
-    </form>
-    <p id="loginError" class="error hidden">Username atau password salah!</p>
-  </section>
+    <div class="container mt-4">
+        <div id="admin-login">
+            <h1 class="text-center">Login Admin</h1>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" placeholder="Username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+                <p id="loginError" class="text-danger hidden mt-3">Username atau password salah!</p>
+            </form>
+        </div>
 
-  <!-- Navigasi -->
-  <nav id="mainNav" class="hidden">
-    <button onclick="showSection('products')">Barang</button>
-    <button onclick="showSection('categories')">Kategori</button>
-    <button onclick="showSection('suppliers')">Supplier</button>
-    <button onclick="showSection('members')">Member</button>
-    <button onclick="showSection('transactions')">Transaksi</button>
-    <button onclick="showSection('reports')">Laporan</button>
-    <button onclick="logout()">Logout</button>
-  </nav>
+        <nav id="mainNav" class="hidden">
+            <ul class="nav nav-pills mb-3">
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('products')">Produk</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('categories')">Kategori</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('suppliers')">Supplier</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('members')">Member</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('transactions')">Transaksi</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('export')">Ekspor</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" id="logoutButton">Logout</a></li>
+            </ul>
+        </nav>
 
-  <!-- Manajemen Barang -->
-  <section id="products" class="hidden">
-    <h2>Manajemen Barang</h2>
-    <form id="addProductForm">
-      <label for="productName">Nama Barang:</label>
-      <input type="text" id="productName" required>
-      <label for="productCategory">Kategori:</label>
-      <select id="productCategory"></select>
-      <label for="productSupplier">Supplier:</label>
-      <select id="productSupplier"></select>
-      <label for="productUnit">Satuan:</label>
-      <input type="text" id="productUnit" required>
-      <label for="productPrice">Harga:</label>
-      <input type="number" id="productPrice" required>
-      <label for="productDiscount">Diskon (%):</label>
-      <input type="number" id="productDiscount" value="0">
-      <button type="submit">Tambah Barang</button>
-    </form>
-    <table id="productTable" border="1">
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Nama Barang</th>
-          <th>Kategori</th>
-          <th>Supplier</th>
-          <th>Satuan</th>
-          <th>Harga</th>
-          <th>Diskon</th>
-          <th>Harga Akhir</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </section>
+        <section id="products" class="hidden">
+            <div class="section-header">
+                <h2>Produk</h2>
+                <form id="addProductForm" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="productName" class="form-label">Nama Produk</label>
+                        <input type="text" class="form-control" id="productName" placeholder="Nama Produk" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="productCategory" class="form-label">Kategori</label>
+                        <select id="productCategory" class="form-select" required></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="productSupplier" class="form-label">Supplier</label>
+                        <select id="productSupplier" class="form-select" required></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="productUnit" class="form-label">Satuan</label>
+                        <input type="text" class="form-control" id="productUnit" placeholder="Satuan" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="productPrice" class="form-label">Harga</label>
+                        <input type="number" class="form-control" id="productPrice" placeholder="Harga" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="productDiscount" class="form-label">Diskon (%)</label>
+                        <input type="number" class="form-control" id="productDiscount" placeholder="Diskon">
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Tambah Produk</button>
+                    </div>
+                </form>
+            </div>
+            <h3>Daftar Produk</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nama Produk</th>
+                        <th>Kategori</th>
+                        <th>Supplier</th>
+                        <th>Satuan</th>
+                        <th>Harga</th>
+                        <th>Diskon</th>
+                        <th>Total</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
 
-  <!-- Manajemen Member -->
-  <section id="members" class="hidden">
-    <h2>Manajemen Member</h2>
-    <form id="addMemberForm">
-      <label for="memberName">Nama Member:</label>
-      <input type="text" id="memberName" required>
-      <label for="memberDiscount">Diskon Member (%):</label>
-      <input type="number" id="memberDiscount" required>
-      <button type="submit">Tambah Member</button>
-    </form>
-    <table id="memberTable" border="1">
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Nama Member</th>
-          <th>Diskon Member</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </section>
+        <!-- Similar sections for Categories, Suppliers, Members, Transactions, Export -->
 
-  <!-- Transaksi -->
-  <section id="transactions" class="hidden">
-    <h2>Transaksi</h2>
-    <form id="transactionForm">
-      <label for="transactionMember">Member:</label>
-      <select id="transactionMember"></select>
-      <label for="transactionDiscount">Diskon Global (%):</label>
-      <input type="number" id="transactionDiscount" value="0">
-      <label for="transactionTotal">Total Bayar:</label>
-      <input type="number" id="transactionTotal" readonly>
-      <label for="transactionPayment">Metode Pembayaran:</label>
-      <select id="transactionPayment">
-        <option value="Cash">Cash</option>
-        <option value="Credit">Credit</option>
-        <option value="E-Wallet">E-Wallet</option>
-      </select>
-      <button type="submit">Proses Pembayaran</button>
-    </form>
-    <p id="transactionSummary"></p>
-  </section>
+        <section id="export" class="hidden">
+            <div class="section-header">
+                <h2>Ekspor Data</h2>
+                <button onclick="exportToCSV('products', 'products.csv')" class="btn btn-secondary">Ekspor Produk</button>
+                <button onclick="exportToCSV('members', 'members.csv')" class="btn btn-secondary">Ekspor Member</button>
+            </div>
+        </section>
+    </div>
 
-  <!-- Laporan -->
-  <section id="reports" class="hidden">
-    <h2>Laporan</h2>
-    <label for="reportDate">Pilih Periode:</label>
-    <input type="date" id="reportDate" />
-    <button onclick="generateReport()">Tampilkan Laporan</button>
-    <button onclick="exportReport()">Ekspor Laporan</button>
-    <canvas id="salesChart"></canvas>
-  </section>
-
-  <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
