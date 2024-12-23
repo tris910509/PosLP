@@ -1,5 +1,6 @@
-// Data barang (disimpan di memori)
+// Data barang dan transaksi
 let products = [];
+let transactions = [];
 
 // Elemen DOM
 const productTable = document.getElementById("productTable");
@@ -7,8 +8,10 @@ const addForm = document.getElementById("addForm");
 const paymentForm = document.getElementById("paymentForm");
 const paymentSummary = document.getElementById("paymentSummary");
 const exportButton = document.getElementById("exportButton");
+const reportButton = document.getElementById("reportButton");
+const reportDisplay = document.getElementById("reportDisplay");
 
-// Fungsi untuk merender tabel
+// Fungsi untuk merender tabel barang
 function renderTable() {
   productTable.innerHTML = ""; // Kosongkan tabel
 
@@ -33,46 +36,39 @@ function renderTable() {
   });
 }
 
-// Fungsi untuk menambah barang
+// Tambah barang
 addForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
   const name = document.getElementById("name").value;
   const category = document.getElementById("category").value;
   const unit = document.getElementById("unit").value;
-  const price = parseInt(document.getElementById("price").value);
-  const discount = parseInt(document.getElementById("discount").value);
+  const price = parseFloat(document.getElementById("price").value);
+  const discount = parseFloat(document.getElementById("discount").value);
 
   products.push({ name, category, unit, price, discount });
   renderTable();
 
-  // Reset form
   addForm.reset();
 });
 
-// Fungsi untuk mengedit barang
+// Edit barang
 function editProduct(index) {
   const product = products[index];
 
   const newName = prompt("Masukkan nama baru:", product.name);
   const newCategory = prompt("Masukkan kategori baru:", product.category);
   const newUnit = prompt("Masukkan satuan baru:", product.unit);
-  const newPrice = prompt("Masukkan harga baru:", product.price);
-  const newDiscount = prompt("Masukkan diskon baru (%):", product.discount);
+  const newPrice = parseFloat(prompt("Masukkan harga baru:", product.price));
+  const newDiscount = parseFloat(prompt("Masukkan diskon baru (%):", product.discount));
 
-  if (newName && newCategory && newUnit && newPrice && newDiscount) {
-    products[index] = {
-      name: newName,
-      category: newCategory,
-      unit: newUnit,
-      price: parseInt(newPrice),
-      discount: parseInt(newDiscount),
-    };
+  if (newName && newCategory && newUnit && !isNaN(newPrice) && !isNaN(newDiscount)) {
+    products[index] = { name: newName, category: newCategory, unit: newUnit, price: newPrice, discount: newDiscount };
     renderTable();
   }
 }
 
-// Fungsi untuk menghapus barang
+// Hapus barang
 function deleteProduct(index) {
   if (confirm("Apakah Anda yakin ingin menghapus barang ini?")) {
     products.splice(index, 1);
@@ -80,26 +76,27 @@ function deleteProduct(index) {
   }
 }
 
-// Fungsi untuk pembayaran
+// Proses pembayaran
 paymentForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  const total = products.reduce((sum, product) => {
-    return sum + (product.price - (product.price * product.discount / 100));
-  }, 0);
-
+  const total = products.reduce((sum, product) => sum + (product.price - (product.price * product.discount / 100)), 0);
   const paymentMethod = document.getElementById("paymentMethod").value;
-  const amountPaid = parseInt(document.getElementById("amountPaid").value);
+  const amountPaid = parseFloat(document.getElementById("amountPaid").value);
 
   if (amountPaid >= total) {
     const change = amountPaid - total;
-    paymentSummary.textContent = `Metode: ${paymentMethod}, Total: Rp ${total.toLocaleString()}, Kembalian: Rp ${change.toLocaleString()}`;
+    transactions.push({ products, total, paymentMethod, amountPaid, change, date: new Date() });
+
+    paymentSummary.textContent = `Total: Rp ${total.toLocaleString()}, Dibayar: Rp ${amountPaid.toLocaleString()}, Kembalian: Rp ${change.toLocaleString()}`;
+    products = []; // Reset produk setelah transaksi
+    renderTable();
   } else {
     paymentSummary.textContent = "Uang tidak cukup.";
   }
 });
 
-// Fungsi untuk ekspor data
+// Ekspor data barang
 exportButton.addEventListener("click", () => {
   const data = JSON.stringify(products, null, 2);
   const blob = new Blob([data], { type: "application/json" });
@@ -109,9 +106,13 @@ exportButton.addEventListener("click", () => {
   a.href = url;
   a.download = "data_barang.json";
   a.click();
-
   URL.revokeObjectURL(url);
 });
 
-// Render awal tabel
+// Lihat laporan transaksi
+reportButton.addEventListener("click", () => {
+  reportDisplay.textContent = JSON.stringify(transactions, null, 2);
+});
+
+// Render awal
 renderTable();
